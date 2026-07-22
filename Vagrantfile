@@ -1,0 +1,56 @@
+Vagrant.configure("2") do |config|
+    
+  # VM Windows 10
+  config.vm.define "windows" do |win|
+    win.vm.box = "gusztavvargadr/windows-10"
+    win.vm.hostname = "srv-db01"
+    win.vm.network "private_network", ip: "192.168.56.10"
+	
+	# customize o user e password como quiser
+	win.winrm.username = "vagrant"
+	win.winrm.password = "vagrant"
+	
+	win.winrm.transport = :negotiate
+	win.winrm.retry_limit = 30
+	win.winrm.retry_delay = 10
+	
+    win.vm.provider "virtualbox" do |vb|
+      vb.name = "LabSOC_Windows"
+	  vb.memory = "8192"
+      vb.cpus = 4
+	  vb.gui = true
+	  vb.customize ["modifyvm", :id, "--vram", "128"]
+	  vb.customize ["modifyvm", :id, "--graphicscontroller", "vboxsvga"]
+      vb.customize ["modifyvm", :id, "--accelerate3d", "off"]
+      vb.customize ["modifyvm", :id, "--accelerate2dvideo", "off"]
+      vb.customize ["modifyvm", :id, "--ioapic", "on"]
+      vb.customize ["setextradata", :id, "GUI/LastGuestSizeHint", "1920,1080"]
+      vb.customize ["modifyvm", :id, "--mouse", "ps2"]
+    end
+  end
+
+  # VM Ubuntu Linux
+  config.vm.define "linux" do |linux|
+    linux.vm.box = "ubuntu/jammy64"
+    linux.vm.hostname = "analyst"
+    linux.vm.network "private_network", ip: "192.168.56.20"
+	
+    linux.vm.provider "virtualbox" do |vb|
+      vb.name = "LabSOC_Linux"
+      vb.memory = "4096"
+      vb.cpus = 2
+	  vb.gui = true
+	  vb.customize [ "modifyvm", :id, "--uart1", "off" ]
+	  vb.customize [ "modifyvm", :id, "--uartmode1", "file", File::NULL ]
+	  vb.customize ["modifyvm", :id, "--vram", "128"]
+	  vb.customize ["modifyvm", :id, "--graphicscontroller", "vmsvga"]
+      vb.customize ["modifyvm", :id, "--accelerate3d", "on"]
+	  vb.customize ["modifyvm", :id, "--ioapic", "on"]
+	  vb.customize ["setextradata", :id, "VBoxInternal2/EfiGraphicsResolution", "1920x1080"]
+	  vb.customize ["modifyvm", :id, "--mouse", "usb"]
+      vb.customize ["modifyvm", :id, "--keyboard", "usb"]
+	
+    end
+  end  
+end
+3

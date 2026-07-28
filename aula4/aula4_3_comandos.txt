@@ -1,0 +1,113 @@
+================================================================================
+                    AULA 4.3 - COMANDOS DE REFERENCIA
+         Recuperacao de Sistemas e Monitoramento Pos-Recuperacao
+================================================================================
+
+================================================================================
+RESTAURACAO - WINDOWS
+================================================================================
+
+# Listar backups disponiveis
+dir C:\Backup\
+
+# Restaurar arquivos
+copy "C:\Backup\clientes.mdf" "C:\DB_Data\clientes.mdf"
+copy "C:\Backup\vendas.ldf" "C:\DB_Data\vendas.ldf"
+copy "C:\Backup\produtos.mdf" "C:\DB_Data\produtos.mdf"
+copy "C:\Backup\financeiro.ldf" "C:\DB_Data\financeiro.ldf"
+copy "C:\Backup\rh_dados.mdf" "C:\DB_Data\rh_dados.mdf"
+
+# Verificar
+dir C:\DB_Data\
+type C:\DB_Data\clientes.mdf
+
+================================================================================
+VALIDACAO DE INTEGRIDADE - WINDOWS
+================================================================================
+
+# Gerar hash de um arquivo
+Get-FileHash -Path "C:\DB_Data\clientes.mdf" -Algorithm SHA256
+
+# Gerar manifesto de todos os arquivos
+Get-ChildItem "C:\DB_Data\" -File | ForEach-Object {
+    $hash = (Get-FileHash -Path $_.FullName -Algorithm SHA256).Hash
+    "$hash  $($_.Name)"
+} | Out-File "C:\DB_Data\manifesto_restaurado.sha256"
+
+# Comparar com manifesto do backup
+Compare-Object -ReferenceObject (Get-Content "C:\Backup\manifesto_backup.sha256") -DifferenceObject (Get-Content "C:\DB_Data\manifesto_restaurado.sha256")
+
+================================================================================
+RESTAURACAO - LINUX (como root: sudo su -)
+================================================================================
+
+# Listar backups
+ls -la /backup/
+
+# Restaurar arquivos
+cp /backup/clientes.mdf /data/db/clientes.mdf
+cp /backup/vendas.ldf /data/db/vendas.ldf
+cp /backup/produtos.mdf /data/db/produtos.mdf
+
+# Verificar
+ls -la /data/db/
+cat /data/db/clientes.mdf
+
+================================================================================
+VALIDACAO DE INTEGRIDADE - LINUX (como root)
+================================================================================
+
+# Gerar hash de um arquivo
+sha256sum /data/db/clientes.mdf
+
+# Gerar manifesto de todos os arquivos
+sha256sum /data/db/* > /data/db/manifesto_restaurado.sha256
+
+# Comparar com manifesto do backup
+diff /backup/manifesto_backup.sha256 /data/db/manifesto_restaurado.sha256
+
+================================================================================
+MONITORAMENTO - WINDOWS
+================================================================================
+
+# Conexoes de rede
+netstat -ano | findstr "LISTENING"
+Get-NetTCPConnection -State Listen | Select-Object LocalPort, OwningProcess
+
+# Processos
+Get-Process | Select-Object Name, Id, Path
+
+# Tarefas agendadas
+schtasks /query /fo LIST /v
+
+# Registro Run
+reg query "HKLM\Software\Microsoft\Windows\CurrentVersion\Run"
+
+# Firewall
+Get-NetFirewallRule -Direction Inbound | Where-Object { $_.Action -eq "Allow" }
+
+================================================================================
+MONITORAMENTO - LINUX (como root)
+================================================================================
+
+# Conexoes de rede
+ss -tlnp
+
+# Processos
+ps auxf
+
+# Processos em /tmp (suspeitos)
+ps aux | grep "/tmp/"
+
+# Cron jobs
+crontab -l
+cat /etc/crontab
+ls -la /etc/cron.d/
+
+# Servicos
+systemctl list-units --type=service
+
+# Firewall
+iptables -L -v
+
+================================================================================

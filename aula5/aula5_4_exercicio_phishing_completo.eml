@@ -1,0 +1,44 @@
+Received: from mail-srv05.xmail.biz (mail-srv05.xmail.biz [185.220.101.34])
+        by mail.techvarejo.com.br (Postfix) with ESMTP id 7E4F21A0B4D
+        for <maria.santos@techvarejo.com.br>; Fri, 19 Jun 2026 14:22:00 -0300 (BRT)
+From: "Departamento Financeiro" <financeiro@techvarejo-rh.com>
+Reply-To: financeiro@techvarejo-rh.com
+Return-Path: bounce@mail-srv05.xmail.biz
+Subject: URGENTE: Atualização Cadastral - Pagamento de Fornecedores
+To: maria.santos@techvarejo.com.br
+CC: carlos.oliveira@techvarejo.com.br, joao.silva@techvarejo.com.br, ana.lima@techvarejo.com.br, pedro.costa@techvarejo.com.br, juliana.souza@techvarejo.com.br, rafael.mendes@techvarejo.com.br, beatriz.alves@techvarejo.com.br
+Date: Fri, 19 Jun 2026 14:22:00 -0300
+MIME-Version: 1.0
+Content-Type: text/html; charset="UTF-8"
+Authentication-Results: mail.techvarejo.com.br;
+        spf=fail (sender IP is 185.220.101.34) smtp.mailfrom=mail-srv05.xmail.biz;
+        dkim=none;
+        dmarc=fail (p=reject) header.from=techvarejo-rh.com
+
+<html>
+<body>
+<p>Prezada Gerente Financeira Maria Santos,</p>
+
+<p>O Departamento Financeiro está realizando a atualização cadastral
+obrigatória de todos os fornecedores ativos.</p>
+
+<p><strong>Identificamos inconsistências nos dados bancários de 3 fornecedores
+sob sua gestão. A regularização é obrigatória até hoje, 19/06/2026,
+para evitar o bloqueio dos pagamentos da próxima semana.</strong></p>
+
+<p>Para regularizar, acesse o portal de fornecedores e confira os dados:</p>
+
+<p><a href="https://techvarejo-rh.com/portal/fornecedores/atualizacao?user=maria.santos&token=ref123">
+Clique aqui para acessar o Portal de Fornecedores</a></p>
+
+<p>Este processo leva aproximadamente 5 minutos.</p>
+
+<p>Em caso de dúvidas, não responda a este e-mail. Entre em contato
+pelo ramal 1234.</p>
+
+<p>Atenciosamente,<br>
+Departamento Financeiro<br>
+TechVarejo S.A.</p>
+
+</body>
+</html>

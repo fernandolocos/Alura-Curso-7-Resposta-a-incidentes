@@ -1,0 +1,154 @@
+================================================================================
+                    AULA 3.3 - COMANDOS DE REFERENCIA
+     Bloqueio de Credenciais, Revogacao de Acessos e Movimento Lateral
+================================================================================
+
+================================================================================
+LABORATORIO - MOVIMENTO LATERAL REAL (SSH)
+================================================================================
+
+# === PREPARACAO ===
+
+# Na VM Windows - simular atacante conectando
+ssh svc_backup@192.168.56.20
+# Digitar 'yes' para o fingerprint, se for o caso
+# Senha: Senha123!
+# Deixar sessao aberta
+
+# Na VM Linux (segundo terminal) - verificar conexao estabelecida
+sudo ss -tnp state established | grep :22
+# Deve mostrar: 192.168.56.20:22 -> 192.168.56.10:xxxxx ESTAB
+
+# === CONTENCAO (executar na VM Linux) ===
+
+sudo su -
+
+# 1. Coletar evidencias da conexao ativa
+ss -tnp > /evidencias/conexao_atacante.txt
+who > /evidencias/usuarios_logados.txt
+ps auxf > /evidencias/processos.txt
+cat /evidencias/conexao_atacante.txt | grep :22
+
+# 2. Bloquear a conta comprometida
+passwd -l svc_backup
+
+# 3. Encerrar sessoes ativas do usuario
+pkill -u svc_backup
+
+# 4. Bloquear porta SSH (impedir reconexao)
+iptables -A INPUT -p tcp --dport 22 -j DROP
+
+# 5. Verificar que a conexao caiu
+ss -tnp state established | grep :22
+# Nao deve retornar nada
+
+exit
+
+# === REVERTER (apenas exercicio) ===
+
+sudo su -
+passwd -u svc_backup
+iptables -F
+systemctl restart ssh
+exit
+
+================================================================================
+BLOQUEIO DE CREDENCIAIS - WINDOWS (AD)
+================================================================================
+
+# Desabilitar conta
+Disable-ADAccount -Identity "usuario"
+
+# Resetar senha
+Reset-ADAccountPassword -Identity "usuario" -NewPassword (Read-Host "Nova senha" -AsSecureString)
+
+================================================================================
+BLOQUEIO DE CREDENCIAIS - AZURE AD / MICROSOFT 365
+================================================================================
+
+# Bloquear conta
+Set-AzureADUser -ObjectId "usuario@empresa.com" -AccountEnabled $false
+
+# Invalidar todos os tokens
+Revoke-AzureADUserAllRefreshToken -ObjectId "usuario@empresa.com"
+
+================================================================================
+BLOQUEIO DE CREDENCIAIS - LINUX
+================================================================================
+
+# Bloquear conta
+sudo passwd -l usuario
+
+# Forcar expiracao de senha
+sudo chage -d 0 usuario
+
+# Matar todas as sessoes do usuario
+sudo pkill -u usuario
+
+# Verificar processos restantes
+ps -u usuario
+
+================================================================================
+COLETA DE EVIDENCIAS - LINUX (COMO ROOT)
+================================================================================
+
+sudo su -
+
+# Conexoes de rede
+ss -tnp > /evidencias/conexoes.txt
+
+# Processos
+ps auxf > /evidencias/processos.txt
+
+# Usuarios logados
+who > /evidencias/usuarios.txt
+
+exit
+
+================================================================================
+CONTENCAO DE MOVIMENTO LATERAL - WINDOWS
+================================================================================
+
+# Bloquear RDP (entrada)
+netsh advfirewall firewall add rule name="Block_RDP_In" dir=in localport=3389 protocol=tcp action=block
+
+# Bloquear SMB (entrada e saida)
+netsh advfirewall firewall add rule name="Block_SMB_In" dir=in localport=445 protocol=tcp action=block
+netsh advfirewall firewall add rule name="Block_SMB_Out" dir=out remoteport=445 protocol=tcp action=block
+
+# Bloquear WinRM (entrada)
+netsh advfirewall firewall add rule name="Block_WinRM_In" dir=in localport=5985 protocol=tcp action=block
+
+# Verificar regras
+netsh advfirewall firewall show rule name="Block_RDP_In"
+
+# Remover regras (reverter)
+netsh advfirewall firewall delete rule name="Block_RDP_In"
+netsh advfirewall firewall delete rule name="Block_SMB_In"
+netsh advfirewall firewall delete rule name="Block_SMB_Out"
+netsh advfirewall firewall delete rule name="Block_WinRM_In"
+
+================================================================================
+CONTENCAO DE MOVIMENTO LATERAL - LINUX (COMO ROOT)
+================================================================================
+
+sudo su -
+
+# Bloquear SSH (entrada)
+iptables -A INPUT -p tcp --dport 22 -j DROP
+
+# Bloquear SMB (saida)
+iptables -A OUTPUT -p tcp --dport 445 -j DROP
+
+# Bloquear RDP (saida)
+iptables -A OUTPUT -p tcp --dport 3389 -j DROP
+
+# Verificar regras
+iptables -L -v
+
+# Remover todas as regras (reverter)
+iptables -F
+
+exit
+
+================================================================================

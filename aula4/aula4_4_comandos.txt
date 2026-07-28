@@ -1,0 +1,125 @@
+================================================================================
+                    AULA 4.4 - COMANDOS DE REFERENCIA
+      Laboratorio Completo de Erradicacao e Recuperacao
+================================================================================
+
+================================================================================
+FASE 1 - IDENTIFICACAO
+================================================================================
+
+--- Windows ---
+netstat -ano | findstr "LISTENING"
+schtasks /query /fo LIST /v | findstr /i "update"
+reg query "HKLM\Software\Microsoft\Windows\CurrentVersion\Run"
+Get-NetFirewallRule | Where-Object { (Get-NetFirewallPortFilter -AssociatedNetFirewallRule $_).LocalPort -eq 2222 }
+
+--- Linux (sudo su -) ---
+ps aux | grep -E "\.(sh|py|pl|rb)$|backdoor|reverse|nc |netcat" | grep -v grep
+ss -tlnp
+crontab -l
+cat /etc/cron.d/nginx-backdoor 2>/dev/null
+systemctl list-units --type=service | grep nginx
+
+================================================================================
+FASE 2 - REMOCAO
+================================================================================
+
+--- Windows ---
+$pid = (Get-NetTCPConnection -LocalPort 2222).OwningProcess; if ($pid) { Stop-Process -Id $pid -Force }
+schtasks /delete /tn "WindowsUpdate" /f
+reg delete "HKLM\Software\Microsoft\Windows\CurrentVersion\Run" /v "Windows Service" /f
+mkdir C:\Quarentena; move "C:\ProgramData\Microsoft\winupdate.bat" C:\Quarentena\
+Remove-NetFirewallRule -DisplayName "Allow_SSH_Backdoor"
+
+--- Linux (sudo su -) ---
+pkill -f "nginx-backdoor"
+pkill -f "nc -l -p 4444"
+crontab -l | grep -v "nginx-backdoor" | crontab -
+rm /etc/cron.d/nginx-backdoor 2>/dev/null
+systemctl stop nginx-backup 2>/dev/null
+systemctl disable nginx-backup 2>/dev/null
+rm /etc/systemd/system/nginx-backup.service 2>/dev/null
+systemctl daemon-reload
+mkdir -p /quarentena
+mv /tmp/.nginx-backdoor /quarentena/ 2>/dev/null
+mv /tmp/.backdoor.log /quarentena/ 2>/dev/null
+
+================================================================================
+FASE 3 - VALIDACAO
+================================================================================
+
+--- Windows ---
+netstat -ano | findstr "2222"
+schtasks /query /tn "WindowsUpdate"
+reg query "HKLM\Software\Microsoft\Windows\CurrentVersion\Run" /v "Windows Service"
+Get-NetFirewallRule -DisplayName "Allow_SSH_Backdoor"
+dir C:\ProgramData\Microsoft\winupdate.bat
+
+--- Linux ---
+ps aux | grep -E "nginx-backdoor|nc -l" | grep -v grep
+ss -tlnp | grep 4444
+crontab -l | grep nginx-backdoor
+ls -la /etc/cron.d/nginx-backdoor 2>/dev/null
+systemctl status nginx-backup 2>/dev/null
+ls -la /tmp/.nginx-backdoor /tmp/.backdoor.log 2>/dev/null
+
+================================================================================
+FASE 4 - RECUPERACAO
+================================================================================
+
+--- Windows ---
+copy "C:\Backup\clientes.mdf" "C:\DB_Data\clientes.mdf"
+copy "C:\Backup\vendas.ldf" "C:\DB_Data\vendas.ldf"
+copy "C:\Backup\produtos.mdf" "C:\DB_Data\produtos.mdf"
+copy "C:\Backup\financeiro.ldf" "C:\DB_Data\financeiro.ldf"
+copy "C:\Backup\rh_dados.mdf" "C:\DB_Data\rh_dados.mdf"
+type C:\DB_Data\clientes.mdf
+
+--- Linux ---
+cp /backup/clientes.mdf /data/db/clientes.mdf
+cp /backup/vendas.ldf /data/db/vendas.ldf
+cp /backup/produtos.mdf /data/db/produtos.mdf
+cat /data/db/clientes.mdf
+
+================================================================================
+FASE 4 - VALIDACAO DE INTEGRIDADE
+================================================================================
+
+--- Windows ---
+Get-ChildItem "C:\DB_Data\" -File | ForEach-Object {
+    $hash = (Get-FileHash -Path $_.FullName -Algorithm SHA256).Hash
+    "$hash  $($_.Name)"
+} | Out-File "C:\DB_Data\manifesto_restaurado.sha256"
+Compare-Object (Get-Content "C:\Backup\manifesto_backup.sha256") (Get-Content "C:\DB_Data\manifesto_restaurado.sha256")
+
+--- Linux ---
+sha256sum /data/db/* > /data/db/manifesto_restaurado.sha256
+grep -v "^#" /backup/manifesto_backup.sha256 | sort > /tmp/backup_sorted.txt
+grep -v "^#" /data/db/manifesto_restaurado.sha256 | sort > /tmp/restaurado_sorted.txt
+diff /tmp/backup_sorted.txt /tmp/restaurado_sorted.txt
+
+================================================================================
+LIMPEZA DO AMBIENTE
+================================================================================
+
+--- Windows ---
+Remove-Item "C:\Quarentena\winupdate.bat" -Force -ErrorAction SilentlyContinue
+schtasks /delete /tn "WindowsUpdate" /f 2>$null
+reg delete "HKLM\Software\Microsoft\Windows\CurrentVersion\Run" /v "Windows Service" /f 2>$null
+Remove-NetFirewallRule -DisplayName "Allow_SSH_Backdoor" -ErrorAction SilentlyContinue
+
+--- Linux (sudo su -) ---
+pkill -f "nginx-backdoor" 2>/dev/null
+pkill -f "nc -l -p 4444" 2>/dev/null
+crontab -l | grep -v "nginx-backdoor" | crontab - 2>/dev/null
+rm /etc/cron.d/nginx-backdoor 2>/dev/null
+systemctl stop nginx-backup 2>/dev/null
+systemctl disable nginx-backup 2>/dev/null
+rm /etc/systemd/system/nginx-backup.service 2>/dev/null
+systemctl daemon-reload
+rm -rf /quarentena 2>/dev/null
+rm /tmp/.nginx-backdoor /tmp/.backdoor.log 2>/dev/null
+rm /data/db/manifesto_restaurado.sha256 2>/dev/null
+rm /tmp/backup_sorted.txt /tmp/restaurado_sorted.txt 2>/dev/null
+
+================================================================================

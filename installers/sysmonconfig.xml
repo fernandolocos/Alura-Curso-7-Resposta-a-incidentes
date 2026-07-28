@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Sysmon schemaversion="4.90">
+    <EventFiltering>
+        <!-- Logar todos os processos criados (Event ID 1) -->
+        <ProcessCreate onmatch="exclude" />
+
+        <!-- Logar conexoes de rede (Event ID 3) -->
+        <NetworkConnect onmatch="exclude" />
+
+        <!-- Logar criacao de arquivos em diretorios sensiveis -->
+        <FileCreateTime onmatch="include">
+            <TargetFilename condition="begin with">C:\DB_Data\</TargetFilename>
+            <TargetFilename condition="begin with">C:\Backup\</TargetFilename>
+            <TargetFilename condition="begin with">C:\Windows\Temp\</TargetFilename>
+        </FileCreateTime>
+
+        <!-- Logar criacao de servicos -->
+        <DriverLoad onmatch="exclude" />
+        <CreateRemoteThread onmatch="exclude" />
+        <RawAccessRead onmatch="exclude" />
+        <ProcessAccess onmatch="exclude" />
+        <FileCreate onmatch="exclude" />
+        <FileCreateStreamHash onmatch="exclude" />
+        <PipeEvent onmatch="exclude" />
+        <WmiEvent onmatch="exclude" />
+        <DnsQuery onmatch="exclude" />
+        <FileDelete onmatch="exclude" />
+        <ClipboardChange onmatch="exclude" />
+        <ProcessTampering onmatch="exclude" />
+        <FileDeleteDetected onmatch="exclude" />
+    </EventFiltering>
+</Sysmon>

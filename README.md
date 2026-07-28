@@ -6,7 +6,7 @@ Este curso cobre o ciclo completo de resposta a incidentes com foco no que um an
 
 * * *
 
-## 📋 Sobre o Curso
+## Sobre o Curso
 
 Este curso capacita profissionais para atuar na resposta a incidentes de segurança cibernética. São 24 vídeos distribuídos em 6 aulas, totalizando aproximadamente 6 horas de conteúdo prático.
 
@@ -14,7 +14,7 @@ O diferencial está nos laboratórios: você não apenas assiste, você executa.
 
 * * *
 
-## 🎯 Objetivos de Aprendizagem
+## Objetivos de Aprendizagem
 
 Ao final do curso, você será capaz de:
 
@@ -35,13 +35,13 @@ Ao final do curso, você será capaz de:
 
 * * *
 
-## 🖥️ Pré-requisitos Técnicos
+## Pré-requisitos Técnicos
 
 <div class="joplin-table-wrapper"><table style="border-collapse: collapse; width: 752px; max-width: unset;" class="jop-noMdConv"><thead class="jop-noMdConv"><tr class="jop-noMdConv"><th style="border-bottom: 0.8px solid rgba(0, 0, 0, 0.12); font: 500 15px / 25px quote-cjk-patch, Inter, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif; border-top-width: medium; border-top-style: none; border-top-color: currentcolor; min-width: 100px; max-width: min(30vw, 320px); padding: 10px 16px 10px 0px; text-align: left;" class="jop-noMdConv"><span class="">Requisito</span></th><th style="border-bottom: 0.8px solid rgba(0, 0, 0, 0.12); font: 500 15px / 25px quote-cjk-patch, Inter, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif; border-top-width: medium; border-top-style: none; border-top-color: currentcolor; min-width: 100px; max-width: min(30vw, 320px); padding: 10px 16px; text-align: left;" class="jop-noMdConv"><span class="">Detalhe</span></th></tr></thead><tbody class="jop-noMdConv"><tr class="jop-noMdConv"><td style="border-bottom: 0.8px solid rgba(0, 0, 0, 0.1); font: 400 15px / 25px quote-cjk-patch, Inter, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif; min-width: 100px; max-width: min(30vw, 320px); padding: 10px 16px 10px 0px;" class="jop-noMdConv"><strong style="font-weight: 600;" class="jop-noMdConv"><span class="">Computador</span></strong></td><td style="border-bottom: 0.8px solid rgba(0, 0, 0, 0.1); font: 400 15px / 25px quote-cjk-patch, Inter, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif; min-width: 100px; max-width: min(30vw, 320px); padding: 10px 0px 10px 16px;" class="jop-noMdConv"><span class="">8 GB de RAM (16 GB recomendado)</span></td></tr><tr class="jop-noMdConv"><td style="border-bottom: 0.8px solid rgba(0, 0, 0, 0.1); font: 400 15px / 25px quote-cjk-patch, Inter, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif; min-width: 100px; max-width: min(30vw, 320px); padding: 10px 16px 10px 0px;" class="jop-noMdConv"><strong style="font-weight: 600;" class="jop-noMdConv"><span class="">Espaço em disco</span></strong></td><td style="border-bottom: 0.8px solid rgba(0, 0, 0, 0.1); font: 400 15px / 25px quote-cjk-patch, Inter, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif; min-width: 100px; max-width: min(30vw, 320px); padding: 10px 0px 10px 16px;" class="jop-noMdConv"><span class="">50 GB livres</span></td></tr><tr class="jop-noMdConv"><td style="border-bottom: 0.8px solid rgba(0, 0, 0, 0.1); font: 400 15px / 25px quote-cjk-patch, Inter, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif; min-width: 100px; max-width: min(30vw, 320px); padding: 10px 16px 10px 0px;" class="jop-noMdConv"><strong style="font-weight: 600;" class="jop-noMdConv"><span class="">Processador</span></strong></td><td style="border-bottom: 0.8px solid rgba(0, 0, 0, 0.1); font: 400 15px / 25px quote-cjk-patch, Inter, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif; min-width: 100px; max-width: min(30vw, 320px); padding: 10px 0px 10px 16px;" class="jop-noMdConv"><span class="">Suporte a virtualização (Intel VT-x / AMD-V)</span></td></tr><tr class="jop-noMdConv"><td style="border-bottom: 0.8px solid rgba(0, 0, 0, 0.1); font: 400 15px / 25px quote-cjk-patch, Inter, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif; min-width: 100px; max-width: min(30vw, 320px); padding: 10px 16px 10px 0px;" class="jop-noMdConv"><strong style="font-weight: 600;" class="jop-noMdConv"><span class="">Sistema Operacional</span></strong></td><td style="border-bottom: 0.8px solid rgba(0, 0, 0, 0.1); font: 400 15px / 25px quote-cjk-patch, Inter, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif; min-width: 100px; max-width: min(30vw, 320px); padding: 10px 0px 10px 16px;" class="jop-noMdConv"><span class="">Windows, Linux ou macOS</span></td></tr><tr class="jop-noMdConv"><td style="border-bottom: 0.8px solid rgba(0, 0, 0, 0.1); font: 400 15px / 25px quote-cjk-patch, Inter, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif; min-width: 100px; max-width: min(30vw, 320px); padding: 10px 16px 10px 0px;" class="jop-noMdConv"><strong style="font-weight: 600;" class="jop-noMdConv"><span class="">Software</span></strong></td><td style="border-bottom: 0.8px solid rgba(0, 0, 0, 0.1); font: 400 15px / 25px quote-cjk-patch, Inter, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif; min-width: 100px; max-width: min(30vw, 320px); padding: 10px 0px 10px 16px;" class="jop-noMdConv"><span class="">VirtualBox 7.0+, Vagrant 2.4+</span></td></tr><tr class="jop-noMdConv"><td style="border-bottom: 0.8px solid rgba(0, 0, 0, 0.1); font: 400 15px / 25px quote-cjk-patch, Inter, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif; min-width: 100px; max-width: min(30vw, 320px); padding: 10px 16px 10px 0px;" class="jop-noMdConv"><strong style="font-weight: 600;" class="jop-noMdConv"><span class="">Máquinas Virtuais</span></strong></td><td style="border-bottom: 0.8px solid rgba(0, 0, 0, 0.1); font: 400 15px / 25px quote-cjk-patch, Inter, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif; min-width: 100px; max-width: min(30vw, 320px); padding: 10px 0px 10px 16px;" class="jop-noMdConv"><span class="">Windows 10 + Ubuntu 22.04 (criadas via Vagrant)</span></td></tr></tbody></table></div>
 
 * * *
 
-## 🚀 Instalação Rápida
+## Instalação Rápida
 
 1.  Instale o VirtualBox e o Vagrant
     
@@ -56,7 +56,7 @@ Ao final do curso, você será capaz de:
 
 * * *
 
-## 🛠️ Tecnologias Utilizadas
+## Tecnologias Utilizadas
 
 - **Virtualização:** VirtualBox + Vagrant
     

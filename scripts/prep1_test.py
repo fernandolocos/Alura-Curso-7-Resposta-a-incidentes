@@ -92,22 +92,7 @@ for cmd, desc, package in network_tools:
         f"Não encontrado. Execute: sudo apt install -y {package}"
     )
 
-# 4. Wireshark
-print()
-print(f"{YELLOW}--- Análise de Tráfego ---{RESET}")
-
-wireshark_exists = command_exists("wireshark") or command_exists("tshark")
-if wireshark_exists:
-    test_check("Wireshark instalado", True, "OK", "")
-else:
-    test_check(
-        "Wireshark instalado",
-        False,
-        "",
-        "Não encontrado. Execute 'install_tools_linux.sh' novamente."
-    )
-
-# 5. Comandos nativos do Linux
+# 4. Comandos nativos do Linux
 print()
 print(f"{YELLOW}--- Comandos Nativos do Linux ---{RESET}")
 
@@ -130,7 +115,7 @@ for cmd, desc in native_commands:
         f"Não encontrado. Verifique a instalação do Ubuntu."
     )
 
-# 6. Diretórios de trabalho
+# 5. Diretórios de trabalho
 print()
 print(f"{YELLOW}--- Diretórios de Trabalho ---{RESET}")
 
@@ -150,20 +135,20 @@ for path, desc in dirs:
         f"Não encontrado. Execute 'install_tools_linux.sh' ou crie com: mkdir -p {path}"
     )
 
-# 7. Repositório do curso
+# 6. Repositório do curso
 print()
 print(f"{YELLOW}--- Repositório do Curso ---{RESET}")
 
-repo_path = os.path.expanduser("~/curso-soc-resposta-incidentes")
+repo_path = os.path.expanduser("~/6258-soc-resposta-incidentes")
 repo_exists = os.path.exists(os.path.join(repo_path, "README.md"))
 test_check(
-    f"Repositório clonado em ~/curso-soc-resposta-incidentes",
+    f"Repositório clonado em ~/6258-soc-resposta-incidentes",
     repo_exists,
     "Encontrado",
-    "Repositório não encontrado. Execute: cd ~ && git clone https://github.com/exemplo/curso-soc-resposta-incidentes.git"
+    "Repositório não encontrado. Execute: cd ~ && git clone https://github.com/alura-cursos/6258-soc-resposta-incidentes.git"
 )
 
-# 8. Conectividade de rede
+# 7. Conectividade de rede
 print()
 print(f"{YELLOW}--- Conectividade de Rede ---{RESET}")
 
@@ -175,7 +160,7 @@ test_check(
     "Sem acesso à internet. Verifique o adaptador NAT no VirtualBox."
 )
 
-# 9. Espaço em disco
+# 8. Espaço em disco
 print()
 print(f"{YELLOW}--- Recursos do Sistema ---{RESET}")
 

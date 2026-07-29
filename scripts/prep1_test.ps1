@@ -87,7 +87,7 @@ foreach ($dir in $dirs) {
 Write-Host ""
 Write-Host "--- Repositorio do Curso ---" -ForegroundColor Yellow
 
-$repoPath = "C:\6258-soc-resposta-incidentes.git"
+$repoPath = "C:\6258-soc-resposta-incidentes"
 $repoExists = Test-Path "$repoPath\README.md"
 
 Test-Check -Description "Repositorio clonado em $repoPath" `

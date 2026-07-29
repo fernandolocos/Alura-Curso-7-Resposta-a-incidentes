@@ -13,7 +13,7 @@ $allSuccess = $true
 # 1. Criar diretorios de trabalho
 # ============================================================
 
-Write-Host "[1/4] Criando diretorios de trabalho..." -ForegroundColor Yellow
+Write-Host "[1/3] Criando diretorios de trabalho..." -ForegroundColor Yellow
 $dirs = @("C:\Temp", "C:\Scripts", "C:\Evidencias", "C:\Installers")
 foreach ($dir in $dirs) {
     New-Item -ItemType Directory -Path $dir -Force | Out-Null
@@ -24,16 +24,15 @@ Write-Host "  [OK] Diretorios criados: C:\Temp, C:\Scripts, C:\Evidencias" -Fore
 # 2. Instalar Sysinternals Suite (DOWNLOAD MANUAL)
 # ============================================================
 
-Write-Host "[2/4] Sysinternals Suite - Download Manual Necessario" -ForegroundColor Yellow
+Write-Host "[2/3] Sysinternals Suite - Download Manual Necessario" -ForegroundColor Yellow
 Write-Host ""
 Write-Host "  Devido ao tamanho do arquivo, o download nao pode ser automatizado." -ForegroundColor White
 Write-Host "  Siga os passos abaixo:" -ForegroundColor White
 Write-Host ""
-Write-Host "  1. Acesse: https://learn.microsoft.com/en-us/sysinternals/downloads/sysinternals-suite" -ForegroundColor Gray
-Write-Host "  2. Clique em 'Download Sysinternals Suite'" -ForegroundColor Gray
-Write-Host "  3. Salve o arquivo ZIP em C:\\Installers\\" -ForegroundColor Gray
-Write-Host "  4. Extraia o conteudo para C:\\Sysinternals\\" -ForegroundColor Gray
-Write-Host "  5. Pressione ENTER apos concluir..." -ForegroundColor Yellow
+Write-Host "  1. Acesse: https://download.sysinternals.com/files/SysinternalsSuite.zip" -ForegroundColor Gray
+Write-Host "  2. O download será feito automaticamente" -ForegroundColor Gray
+Write-Host "  3. Extraia o conteudo para C:\\Sysinternals\\" -ForegroundColor Gray
+Write-Host "  4. Pressione ENTER apos concluir..." -ForegroundColor Yellow
 Write-Host ""
 
 # Aguardar confirmacao do usuario
@@ -61,7 +60,7 @@ if ($confirm -eq "S") {
 # ============================================================
 
 Write-Host ""
-Write-Host "[3/4] Instalando Python 3..." -ForegroundColor Yellow
+Write-Host "[3/3] Instalando Python 3..." -ForegroundColor Yellow
 
 $pythonUrl = "https://www.python.org/ftp/python/3.11.9/python-3.11.9-amd64.exe"
 $pythonInstaller = "C:\Installers\python_installer.exe"

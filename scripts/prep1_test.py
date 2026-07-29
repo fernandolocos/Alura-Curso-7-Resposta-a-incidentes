@@ -139,13 +139,13 @@ for path, desc in dirs:
 print()
 print(f"{YELLOW}--- Repositório do Curso ---{RESET}")
 
-repo_path = os.path.expanduser("~/curso-soc-resposta-incidentes")
+repo_path = os.path.expanduser("~/6258-soc-resposta-incidentes.git")
 repo_exists = os.path.exists(os.path.join(repo_path, "README.md"))
 test_check(
-    f"Repositório clonado em ~/curso-soc-resposta-incidentes",
+    f"Repositório clonado em ~/6258-soc-resposta-incidentes.git",
     repo_exists,
     "Encontrado",
-    "Repositório não encontrado. Execute: cd ~ && git clone https://github.com/exemplo/curso-soc-resposta-incidentes.git"
+    "Repositório não encontrado. Execute: cd ~ && git clone https://github.com/alura-cursos/6258-soc-resposta-incidentes.git"
 )
 
 # 7. Conectividade de rede

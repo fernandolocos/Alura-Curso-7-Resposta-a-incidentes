@@ -93,7 +93,7 @@ $repoExists = Test-Path "$repoPath\README.md"
 Test-Check -Description "Repositorio clonado em $repoPath" `
     -Condition $repoExists `
     -PassedMessage "Encontrado" `
-    -FailedMessage "Repositorio nao encontrado. Execute: cd C:\ && git clone https://github.com/exemplo/curso-soc-resposta-incidentes.git"
+    -FailedMessage "Repositorio nao encontrado. Execute: cd C:\ && git clone https://github.com/alura-cursos/6258-soc-resposta-incidentes.git"
 
 # 6. Verificar comandos nativos do Windows
 Write-Host ""

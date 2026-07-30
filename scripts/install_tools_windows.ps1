@@ -67,7 +67,14 @@ $pythonInstaller = "C:\Installers\python_installer.exe"
 
 try {
     Write-Host "  Baixando Python 3.11.9..." -ForegroundColor Gray
-    Invoke-WebRequest -Uri $pythonUrl -OutFile $pythonInstaller -ErrorAction Stop
+    
+    # Criar pasta de instaladores se nao existir
+    New-Item -ItemType Directory -Path "C:\Installers" -Force | Out-Null
+    
+    # Usar WebClient (mais rapido que Invoke-WebRequest)
+    $webClient = New-Object System.Net.WebClient
+    $webClient.DownloadFile($pythonUrl, $pythonInstaller)
+    $webClient.Dispose()
     
     if (Test-Path $pythonInstaller) {
         $fileSize = (Get-Item $pythonInstaller).Length

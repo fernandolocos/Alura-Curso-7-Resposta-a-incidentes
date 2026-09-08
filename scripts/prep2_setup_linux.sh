@@ -23,7 +23,7 @@ for USER in "${!USUARIOS[@]}"; do
     if id "$USER" &>/dev/null; then
         echo "  [OK] Usuario $USER ja existe"
     else
-        sudo useradd -m "$USER" -c "${USUARIOS[$USER]}"
+        sudo useradd -m "$USER" -c "${USUARIOS[$USER]}" -s /bin/bash
         echo "$USER:Senha123!" | sudo chpasswd
         echo "  [OK] Usuario $USER criado"
     fi
@@ -38,6 +38,7 @@ echo "[2/5] Configurando SSH para o laboratorio..."
 # Habilitar autenticacao por senha
 sudo sed -i 's/^#\?PasswordAuthentication.*/PasswordAuthentication yes/' /etc/ssh/sshd_config
 sudo sed -i 's/^#\?PubkeyAuthentication.*/PubkeyAuthentication no/' /etc/ssh/sshd_config
+sudo rm /etc/ssh/sshd_config.d/60-cloudimg-settings.conf
 
 # Reiniciar o servico SSH
 sudo systemctl restart ssh

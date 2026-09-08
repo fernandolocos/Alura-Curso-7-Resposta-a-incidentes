@@ -13,7 +13,7 @@ ALL_SUCCESS=true
 # 1. Criar usuários simulados
 # ============================================================
 
-echo "[1/4] Criando usuarios simulados..."
+echo "[1/5] Criando usuarios simulados..."
 
 declare -A USUARIOS
 USUARIOS[svc_backup]="Conta de servico"
@@ -30,10 +30,31 @@ for USER in "${!USUARIOS[@]}"; do
 done
 
 # ============================================================
-# 2. Criar diretórios de simulação
+# 2. Configurar SSH para o laboratorio
 # ============================================================
 
-echo "[2/4] Criando diretorios de simulacao..."
+echo "[2/5] Configurando SSH para o laboratorio..."
+
+# Habilitar autenticacao por senha
+sudo sed -i 's/^#\?PasswordAuthentication.*/PasswordAuthentication yes/' /etc/ssh/sshd_config
+sudo sed -i 's/^#\?PubkeyAuthentication.*/PubkeyAuthentication no/' /etc/ssh/sshd_config
+
+# Reiniciar o servico SSH
+sudo systemctl restart ssh
+
+# Verificar status
+if sudo systemctl is-active --quiet ssh; then
+    echo "  [OK] SSH configurado e rodando"
+else
+    echo "  [ERRO] Falha ao reiniciar o SSH"
+    ALL_SUCCESS=false
+fi
+
+# ============================================================
+# 3. Criar diretórios de simulação
+# ============================================================
+
+echo "[3/5] Criando diretorios de simulacao..."
 
 DIRS=(
     "/data/db"
@@ -54,10 +75,10 @@ for DIR in "${DIRS[@]}"; do
 done
 
 # ============================================================
-# 3. Criar arquivos de dados simulados E MANIFESTOS
+# 4. Criar arquivos de dados simulados E MANIFESTOS
 # ============================================================
 
-echo "[3/4] Criando arquivos de dados simulados..."
+echo "[4/5] Criando arquivos de dados simulados..."
 
 declare -A DATA_FILES
 DATA_FILES[clientes.mdf]="DADOS SIMULADOS - CLIENTES - Registro de clientes ativos e inativos com dados de contato."
@@ -89,10 +110,10 @@ echo "  [OK] Backups criados em /backup/"
 echo "  [OK] Manifesto de integridade gerado: $MANIFESTO"
 
 # ============================================================
-# 4. Configurar permissões
+# 5. Configurar permissões
 # ============================================================
 
-echo "[4/4] Configurando permissoes..."
+echo "[5/5] Configurando permissoes..."
 
 sudo chown -R svc_backup:svc_backup /data/db /backup 2>/dev/null
 sudo chmod 755 /data/db /backup /evidencias /quarentena 2>/dev/null
@@ -113,6 +134,7 @@ echo "=========================================="
 echo ""
 echo "Resumo do que foi configurado:"
 echo "  [OK] Usuarios: svc_backup, carlos.oliveira"
+echo "  [OK] SSH configurado (senha habilitada, chave desabilitada)"
 echo "  [OK] Diretorios: /data/db, /backup, /evidencias, /quarentena"
 echo "  [OK] Arquivos de dados criados (3 arquivos)"
 echo "  [OK] Backups criados (3 arquivos)"

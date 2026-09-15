@@ -13,7 +13,7 @@ $allSuccess = $true
 # 1. Criar diretorios de trabalho
 # ============================================================
 
-Write-Host "[1/3] Criando diretorios de trabalho..." -ForegroundColor Yellow
+Write-Host "[1/4] Criando diretorios de trabalho..." -ForegroundColor Yellow
 $dirs = @("C:\Temp", "C:\Scripts", "C:\Evidencias", "C:\Installers")
 foreach ($dir in $dirs) {
     New-Item -ItemType Directory -Path $dir -Force | Out-Null
@@ -24,7 +24,7 @@ Write-Host "  [OK] Diretorios criados: C:\Temp, C:\Scripts, C:\Evidencias" -Fore
 # 2. Instalar Sysinternals Suite (DOWNLOAD MANUAL)
 # ============================================================
 
-Write-Host "[2/3] Sysinternals Suite - Download Manual Necessario" -ForegroundColor Yellow
+Write-Host "[2/4] Sysinternals Suite - Download Manual Necessario" -ForegroundColor Yellow
 Write-Host ""
 Write-Host "  Devido ao tamanho do arquivo, o download nao pode ser automatizado." -ForegroundColor White
 Write-Host "  Siga os passos abaixo:" -ForegroundColor White
@@ -60,7 +60,7 @@ if ($confirm -eq "S") {
 # ============================================================
 
 Write-Host ""
-Write-Host "[3/3] Instalando Python 3..." -ForegroundColor Yellow
+Write-Host "[3/4] Instalando Python 3..." -ForegroundColor Yellow
 
 $pythonUrl = "https://www.python.org/ftp/python/3.11.9/python-3.11.9-amd64.exe"
 $pythonInstaller = "C:\Installers\python_installer.exe"
@@ -94,6 +94,36 @@ try {
     Write-Host "  Solucao: Baixe manualmente de https://www.python.org/downloads/" -ForegroundColor Yellow
     Write-Host "  IMPORTANTE: Marque 'Add Python to PATH' durante a instalacao" -ForegroundColor Yellow
     $allSuccess = $false
+}
+
+# ============================================================
+# 4. Instalar bibliotecas Python necessarias
+# ============================================================
+
+Write-Host "[4/4] Instalando bibliotecas Python..." -ForegroundColor Yellow
+
+$pythonLibs = @("cryptography")
+
+foreach ($lib in $pythonLibs) {
+    Write-Host "  Verificando $lib..." -ForegroundColor Gray
+    
+    # Verificar se ja esta instalado
+    $checkResult = python -c "import $lib" 2>&1
+    if ($LASTEXITCODE -eq 0) {
+        Write-Host "  [OK] $lib ja instalado" -ForegroundColor Green
+    } else {
+        Write-Host "  Instalando $lib..." -ForegroundColor Gray
+        pip install $lib 2>&1 | Out-Null
+        
+        # Verificar novamente
+        $checkResult = python -c "import $lib" 2>&1
+        if ($LASTEXITCODE -eq 0) {
+            Write-Host "  [OK] $lib instalado com sucesso" -ForegroundColor Green
+        } else {
+            Write-Host "  [ERRO] Falha ao instalar $lib" -ForegroundColor Red
+            $allSuccess = $false
+        }
+    }
 }
 
 

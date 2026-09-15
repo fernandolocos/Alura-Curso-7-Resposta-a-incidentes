@@ -97,10 +97,10 @@ try {
 }
 
 # ============================================================
-# 4. Instalar bibliotecas Python necessarias
+# 4. Instalar bibliotecas Python necessarias e Sysmon
 # ============================================================
 
-Write-Host "[4/4] Instalando bibliotecas Python..." -ForegroundColor Yellow
+Write-Host "[4/4] Instalando bibliotecas Python e Sysmon ..." -ForegroundColor Yellow
 
 $pythonLibs = @("cryptography")
 
@@ -123,6 +123,40 @@ foreach ($lib in $pythonLibs) {
             Write-Host "  [ERRO] Falha ao instalar $lib" -ForegroundColor Red
             $allSuccess = $false
         }
+    }
+}
+
+$sysmonService = Get-Service -Name "Sysmon" -ErrorAction SilentlyContinue
+
+if ($sysmonService) {
+    Write-Host "  [OK] Sysmon ja instalado (Status: $($sysmonService.Status))" -ForegroundColor Green
+} else {
+    Write-Host "  [AVISO] Sysmon nao encontrado. Tentando instalar..." -ForegroundColor Yellow
+    
+    $sysmonExe = "C:\Sysinternals\Sysmon.exe"
+    
+    if (Test-Path $sysmonExe) {
+        Write-Host "  Executando instalador do Sysmon..." -ForegroundColor Gray
+        Start-Process -FilePath $sysmonExe -ArgumentList "-accepteula -i" -Wait -NoNewWindow
+        
+        Start-Sleep -Seconds 2
+        $sysmonService = Get-Service -Name "Sysmon" -ErrorAction SilentlyContinue
+        
+        if ($sysmonService -and $sysmonService.Status -eq "Running") {
+            Write-Host "  [OK] Sysmon instalado e rodando" -ForegroundColor Green
+        } else {
+            Write-Host "  [ERRO] Falha ao instalar Sysmon" -ForegroundColor Red
+            $allSuccess = $false
+        }
+    } else {
+        Write-Host "  [ERRO] Sysmon.exe nao encontrado em C:\Sysinternals\" -ForegroundColor Red
+        Write-Host ""
+        Write-Host "  Para instalar o Sysmon:" -ForegroundColor White
+        Write-Host "  1. Acesse: https://learn.microsoft.com/en-us/sysinternals/downloads/sysmon" -ForegroundColor Gray
+        Write-Host "  2. Baixe o Sysmon.zip" -ForegroundColor Gray
+        Write-Host "  3. Extraia Sysmon.exe para C:\Sysinternals\" -ForegroundColor Gray
+        Write-Host "  4. Execute este script novamente" -ForegroundColor Gray
+        $allSuccess = $false
     }
 }
 

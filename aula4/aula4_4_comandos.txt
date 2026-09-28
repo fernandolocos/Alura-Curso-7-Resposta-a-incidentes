@@ -148,7 +148,7 @@ FASE 4 - VALIDACAO DE INTEGRIDADE
 
 --- Windows ---
 
-Get-ChildItem "C:\DB_Data\" -File | ForEach-Object {
+Get-ChildItem "C:\DB_Data\" -File | Where-Object { $_.Name -ne "manifesto_restaurado.sha256" } | ForEach-Object {
     $hash = (Get-FileHash -Path $_.FullName -Algorithm SHA256).Hash
     "$hash  $($_.Name)"
 } | Out-File "C:\DB_Data\manifesto_restaurado.sha256"
@@ -157,11 +157,8 @@ Compare-Object (Get-Content "C:\Backup\manifesto_backup.sha256") (Get-Content "C
 
 --- Linux ---
 
-sha256sum /data/db/clientes.mdf /data/db/vendas.ldf /data/db/produtos.mdf > /data/db/manifesto_restaurado.sha256
+sha256sum /data/db/produtos.mdf /data/db/clientes.mdf /data/db/vendas.ldf  > /data/db/manifesto_restaurado.sha256
 
-grep -v "^#" /backup/manifesto_backup.sha256 | sort > /tmp/backup_sorted.txt
-grep -v "^#" /data/db/manifesto_restaurado.sha256 | sort > /tmp/restaurado_sorted.txt
-
-diff /tmp/backup_sorted.txt /tmp/restaurado_sorted.txt
+diff /data/db/manifesto_restaurado.sha256 /backup/manifesto_backup.sha256
 
 ================================================================================

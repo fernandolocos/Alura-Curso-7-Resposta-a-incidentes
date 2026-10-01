@@ -1,0 +1,38 @@
+Received: from mail-srv03.xmail.biz (mail-srv03.xmail.biz [185.220.101.34])
+        by mail.techvarejo.com.br (Postfix) with ESMTP id 8F3A21A0B3C
+        for <carlos.oliveira@techvarejo.com.br>; Thu, 19 Jun 2026 08:15:00 -0300 (BRT)
+From: "Departamento de RH" <rh@techvarejo-rh.com>
+Reply-To: rh@techvarejo-rh.com
+Return-Path: bounce@mail-srv03.xmail.biz
+Subject: URGENTE: Atualização de Dados de Benefícios - Prazo Hoje
+To: carlos.oliveira@techvarejo.com.br
+Date: Thu, 19 Jun 2026 08:15:00 -0300
+MIME-Version: 1.0
+Content-Type: text/html; charset="UTF-8"
+Authentication-Results: mail.techvarejo.com.br;
+        spf=fail (sender IP is 185.220.101.34) smtp.mailfrom=mail-srv03.xmail.biz;
+        dkim=none;
+        dmarc=fail (p=reject) header.from=techvarejo-rh.com
+
+<html>
+<body>
+<p>Prezado(a) Carlos Oliveira,</p>
+
+<p>O setor de Recursos Humanos está realizando a atualização anual dos
+dados de benefícios. <strong>Todos os colaboradores devem confirmar
+suas informações até hoje, 19/06/2026.</strong></p>
+
+<p>Para evitar o bloqueio do seu plano de saúde e vale-refeição,
+clique no link abaixo e atualize seus dados:</p>
+
+<p><a href="https://techvarejo-rh.com/portal/beneficios?user=carlos.oliveira">
+Clique aqui para atualizar seus dados de benefícios</a></p>
+
+<p>Este processo leva menos de 2 minutos.</p>
+
+<p>Atenciosamente,<br>
+Departamento de Recursos Humanos<br>
+TechVarejo S.A.</p>
+
+</body>
+</html>

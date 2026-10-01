@@ -1,0 +1,308 @@
+================================================================================
+                    AULA 4.1 - COMANDOS DE REFERENCIA
+            Identificacao de Artefatos Maliciosos
+================================================================================
+
+================================================================================
+PREPARACAO DO LABORATORIO
+================================================================================
+
+# Windows (PowerShell Admin)
+cd C:\curso-soc-resposta-incidentes\scripts
+.\aula4_1_setup_lab.ps1
+
+# Linux (PRIMEIRO vire root)
+sudo su -
+cd ~/curso-soc-resposta-incidentes/scripts
+chmod +x aula4_1_setup_lab.sh
+./aula4_1_setup_lab.sh
+exit
+
+================================================================================
+INVESTIGACAO - WINDOWS
+================================================================================
+
+# Verificar portas escutando
+netstat -ano | findstr "LISTENING"
+netstat -ano | findstr "2222"
+
+# Identificar processo por PID
+tasklist /v | findstr "[PID]"
+
+# Verificar tarefas agendadas
+schtasks /query /fo LIST /v | findstr /i "update"
+
+# Verificar persistencia no registro
+reg query "HKLM\Software\Microsoft\Windows\CurrentVersion\Run"
+
+# Verificar regras de firewall (PowerShell nativo)
+Get-NetFirewallRule | Where-Object { 
+    (Get-NetFirewallPortFilter -AssociatedNetFirewallRule $_).LocalPort -eq 2222 
+} | Select-Object DisplayName, Direction, Action, Enabled, @{N="LocalPort";E={(Get-NetFirewallPortFilter -AssociatedNetFirewallRule $_).LocalPort}} | Format-Table -AutoSize
+
+# Ler conteudo do script suspeito
+type C:\ProgramData\Microsoft\winupdate.bat
+
+================================================================================
+INVESTIGACAO - LINUX (como root)
+================================================================================
+
+sudo su -
+
+# Processos suspeitos com filtro avancado
+ps aux | grep -E "\.(sh|py|pl|rb)$|\.(bin|elf)|backdoor|reverse|nc |ngrok|netcat|perl|python|ruby|bash.*-i" | grep -v grep
+
+# Investigar binario suspeito
+ls -la /tmp/.nginx-backdoor
+cat /tmp/.nginx-backdoor
+cat /tmp/.backdoor.log
+
+# Conexoes de rede
+ss -tlnp
+
+# Cron jobs (usuario E sistema)
+crontab -l
+cat /etc/crontab
+ls -la /etc/cron.d/
+cat /etc/cron.d/nginx-backdoor
+
+# Servicos systemd
+systemctl list-units --type=service | grep nginx
+cat /etc/systemd/system/nginx-backup.service
+
+exit
+
+
+
+================================================================================
+COMANDOS PARA INVESTIGACAO - WINDOWS 
+================================================================================
+
+--- Conexoes de Rede ---
+
+# Verificar todas as portas escutando
+netstat -ano | findstr "LISTENING"
+
+# Filtrar por porta especifica
+netstat -ano | findstr "4444"
+
+# Alternativa: PowerShell nativo (mais poderoso)
+Get-NetTCPConnection -State Listen | Select-Object LocalAddress, LocalPort, OwningProcess | Sort-Object LocalPort
+
+# Identificar o executavel pelo PID
+Get-Process -Id [PID] | Select-Object Name, Path, Company
+
+# Alternativa: comando classico
+tasklist /v | findstr "[PID]"
+
+# Ver TODAS as conexoes estabelecidas
+Get-NetTCPConnection -State Established
+
+--- Tarefas Agendadas ---
+
+# Listar todas as tarefas e filtrar por suspeitas
+schtasks /query /fo LIST /v | findstr /i "update"
+
+# Sugestoes de outros filtros uteis:
+schtasks /query /fo LIST /v | findstr /i "backup sync chrome adobe system security defender office google"
+
+# PowerShell nativo para tarefas agendadas
+Get-ScheduledTask | Where-Object { $_.TaskPath -notlike "\Microsoft\*" } | Select-Object TaskName, TaskPath, State
+
+# Ver detalhes de uma tarefa especifica
+schtasks /query /tn "WindowsUpdate" /fo LIST /v
+
+--- Registro do Windows ---
+
+# Verificar chaves Run (persistencia classica)
+reg query "HKLM\Software\Microsoft\Windows\CurrentVersion\Run"
+reg query "HKCU\Software\Microsoft\Windows\CurrentVersion\Run"
+
+# Outras chaves comuns de persistencia:
+reg query "HKLM\Software\Microsoft\Windows\CurrentVersion\RunOnce"
+reg query "HKLM\Software\Microsoft\Windows\CurrentVersion\RunServices"
+reg query "HKLM\Software\Microsoft\Windows NT\CurrentVersion\Winlogon" /v Shell
+reg query "HKLM\Software\Microsoft\Windows NT\CurrentVersion\Winlogon" /v Userinit
+
+# PowerShell para listar todas as entradas Run
+Get-ItemProperty "HKLM:\Software\Microsoft\Windows\CurrentVersion\Run"
+
+--- Firewall ---
+
+# PowerShell nativo (recomendado)
+Get-NetFirewallRule | Where-Object { 
+    (Get-NetFirewallPortFilter -AssociatedNetFirewallRule $_).LocalPort -eq 2222 
+} | Select-Object DisplayName, Direction, Action, Enabled, @{N="LocalPort";E={(Get-NetFirewallPortFilter -AssociatedNetFirewallRule $_).LocalPort}} | Format-Table -AutoSize
+
+# Alternativa classica
+netsh advfirewall firewall show rule name=all | findstr /i "allow 2222"
+
+# Listar TODAS as regras de entrada
+Get-NetFirewallRule -Direction Inbound | Where-Object { $_.Action -eq "Allow" } | Select-Object DisplayName, Enabled
+
+--- Arquivos Suspeitos ---
+
+# Ler conteudo do script suspeito
+type C:\ProgramData\Microsoft\winupdate.bat
+
+# Procurar arquivos criados/modificados recentemente
+Get-ChildItem "C:\ProgramData\" -Recurse -File | Where-Object { $_.LastWriteTime -gt (Get-Date).AddDays(-7) } | Select-Object FullName, LastWriteTime
+
+# Procurar por executaveis em locais nao padrao
+Get-ChildItem "C:\ProgramData\" -Recurse -Filter "*.exe"
+
+# Verificar conteudo de diretorios ocultos
+Get-ChildItem "C:\ProgramData\" -Force | Where-Object { $_.Attributes -match "Hidden" }
+
+--- Processos ---
+
+# Listar processos com caminho completo
+Get-Process | Select-Object Name, Id, Path | Sort-Object Name
+
+# Identificar processos sem descricao (suspeitos)
+Get-Process | Where-Object { $_.Description -eq $null }
+
+# Listar processos que estao fazendo conexao de rede
+Get-NetTCPConnection | Select-Object OwningProcess | Sort-Object OwningProcess -Unique | ForEach-Object { Get-Process -Id $_.OwningProcess -ErrorAction SilentlyContinue }
+
+================================================================================
+COMANDOS PARA INVESTIGACAO - LINUX (como root)
+================================================================================
+
+sudo su -
+
+--- Processos Suspeitos ---
+
+# Filtro avancado para backdoors comuns
+ps aux | grep -E "\.(sh|py|pl|rb)$|\.(bin|elf)|backdoor|reverse|nc |ngrok|netcat|perl|python|ruby|bash.*-i" | grep -v grep
+
+# Listar TODOS os processos com caminho completo
+ps auxf
+
+# Mostrar processos em arvore (relacao pai-filho)
+ps auxf --forest
+
+# Listar processos que estao ouvindo em portas
+ps aux | grep -E "nc|netcat|ncat|socat|cryptcat"
+
+# Verificar processos rodando de /tmp ou /dev/shm (suspeitos)
+ps aux | grep -E "/tmp/|/dev/shm/"
+
+# Listar processos com binario deletado (tecnica de evasao)
+ls -la /proc/*/exe 2>/dev/null | grep deleted
+
+--- Investigar Binario ---
+
+# Verificar atributos do arquivo
+ls -la /tmp/.nginx-backdoor
+
+# Verificar tipo do arquivo
+file /tmp/.nginx-backdoor
+
+# Ler conteudo
+cat /tmp/.nginx-backdoor
+
+# Verificar strings legiveis no binario (se for compilado)
+strings /tmp/.nginx-backdoor | head -50
+
+# Verificar log da backdoor
+cat /tmp/.backdoor.log
+tail -f /tmp/.backdoor.log  # monitorar em tempo real
+
+--- Conexoes de Rede ---
+
+# Verificar portas escutando (recomendado)
+ss -tlnp
+
+# Alternativa classica
+netstat -tlnp
+
+# Ver TODAS as conexoes (estabelecidas + escutando)
+ss -tanp
+
+# Filtrar por porta especifica
+ss -tlnp | grep "4444"
+
+# Verificar processos que estao usando rede
+lsof -i -P -n | grep LISTEN
+
+# Verificar trafego de rede em tempo real
+tcpdump -i any -nn port 4444
+
+--- Cron Jobs ---
+
+# Verificar crontab do usuario atual
+crontab -l
+
+# Verificar crontab de usuarios especificos
+crontab -l -u root
+crontab -l -u svc_backup
+
+# Verificar cron do sistema
+cat /etc/crontab
+
+# Verificar diretorios de cron
+ls -la /etc/cron.d/
+ls -la /etc/cron.daily/
+ls -la /etc/cron.hourly/
+ls -la /etc/cron.weekly/
+ls -la /etc/cron.monthly/
+
+# Ler conteudo de arquivos em cron.d
+cat /etc/cron.d/*
+for f in /etc/cron.d/*; do echo "=== $f ==="; cat "$f"; done
+
+--- Servicos systemd ---
+
+# Listar todos os servicos
+systemctl list-units --type=service
+
+# Filtrar por nome suspeito
+systemctl list-units --type=service | grep nginx
+systemctl list-units --type=service | grep -E "backup|update|sync|helper|service"
+
+# Verificar status de um servico especifico
+systemctl status nginx-backup
+
+# Verificar arquivo de configuracao do servico
+cat /etc/systemd/system/nginx-backup.service
+
+# Listar servicos modificados recentemente
+find /etc/systemd/system/ -name "*.service" -mtime -7
+
+# Verificar servicos habilitados para iniciar no boot
+systemctl list-unit-files --type=service | grep enabled
+
+--- Arquivos Suspeitos ---
+
+# Procurar arquivos ocultos em /tmp
+ls -la /tmp/
+
+# Procurar arquivos com permissoes de execucao em /tmp
+find /tmp -type f -perm -111 2>/dev/null
+
+# Procurar arquivos modificados nos ultimos 7 dias
+find / -type f -mtime -7 2>/dev/null | grep -v "/proc\|/sys\|/run"
+
+# Procurar por scripts em diretorios nao padrao
+find /tmp /var/tmp /dev/shm -type f \( -name "*.sh" -o -name "*.py" -o -name "*.pl" -o -name "*.rb" \) 2>/dev/null
+
+--- Contas e Grupos ---
+
+# Verificar usuarios criados recentemente
+cat /etc/passwd | grep -v "nologin\|false"
+
+# Verificar membros do grupo sudo/wheel
+grep sudo /etc/group
+grep wheel /etc/group
+
+# Verificar chaves SSH autorizadas
+cat ~/.ssh/authorized_keys
+cat /home/*/.ssh/authorized_keys 2>/dev/null
+
+# Verificar usuarios com shell valido
+grep -v "/nologin\|/false" /etc/passwd
+
+exit
+
+================================================================================

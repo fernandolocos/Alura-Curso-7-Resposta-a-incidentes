@@ -1,0 +1,183 @@
+================================================================================
+                    AULA 3.2 - COMANDOS DE REFERENCIA
+            Isolamento de Endpoints Comprometidos
+================================================================================
+
+================================================================================
+PREPARACAO DO LABORATORIO
+================================================================================
+
+# Na VM Linux - Iniciar servidor C2 simulado
+cd ~/curso-soc-resposta-incidentes/scripts
+chmod +x aula3_2_start_c2_server.sh
+./aula3_2_start_c2_server.sh
+
+# Na VM Windows - Iniciar simulacao de malware
+cd C:\curso-soc-resposta-incidentes\scripts
+.\aula3_2_simulate_c2.ps1
+
+================================================================================
+METODO 1: FIREWALL LOCAL
+================================================================================
+
+# Windows - Bloquear todo trafego
+netsh advfirewall set allprofiles firewallpolicy blockinbound,blockoutbound
+
+# Windows - Verificar politica aplicada
+netsh advfirewall show allprofiles
+
+# Windows - Bloqueio granular (IP especifico)
+netsh advfirewall firewall add rule name="Block_C2" dir=out remoteip=203.0.113.45 protocol=tcp action=block
+
+# Windows - Bloqueio granular (portas de movimento lateral)
+netsh advfirewall firewall add rule name="Block_SMB_Out" dir=out remoteport=445 protocol=tcp action=block
+netsh advfirewall firewall add rule name="Block_RDP_Out" dir=out remoteport=3389 protocol=tcp action=block
+
+# Windows - Reverter firewall
+netsh advfirewall set allprofiles firewallpolicy blockinbound,allowoutbound
+
+# Linux - Bloquear todo trafego (iptables)
+sudo iptables -P INPUT DROP
+sudo iptables -P OUTPUT DROP
+sudo iptables -P FORWARD DROP
+sudo iptables -A INPUT -i lo -j ACCEPT
+sudo iptables -A OUTPUT -o lo -j ACCEPT
+
+# Linux - Verificar regras
+sudo iptables -L -v
+
+# Linux - Reverter iptables
+sudo iptables -P INPUT ACCEPT
+sudo iptables -P OUTPUT ACCEPT
+sudo iptables -P FORWARD ACCEPT
+sudo iptables -F
+
+# Linux - Bloquear com ufw
+sudo ufw enable
+sudo ufw default deny incoming
+sudo ufw default deny outgoing
+
+# Linux - Reverter ufw
+sudo ufw disable
+
+================================================================================
+METODO 2: DESABILITAR ADAPTADOR DE REDE
+================================================================================
+
+# Windows - Listar adaptadores
+Get-NetAdapter
+
+# Windows - Desabilitar TODOS os adaptadores
+Get-NetAdapter | Disable-NetAdapter -Confirm:$false
+
+# Windows - Reabilitar todos os adaptadores
+Get-NetAdapter | Enable-NetAdapter -Confirm:$false
+
+# Windows - Desabilitar um adaptador especifico
+netsh interface set interface "Ethernet 2" admin=disable
+
+# Windows - Reabilitar um adaptador especifico
+netsh interface set interface "Ethernet 2" admin=enable
+
+# Linux - Listar interfaces
+ip link show
+
+# Linux - Desabilitar interface
+sudo ip link set enp0s8 down
+
+# Linux - Reabilitar interface
+sudo ip link set enp0s8 up
+
+# Linux - Via NetworkManager
+sudo nmcli device disconnect enp0s8
+sudo nmcli device connect enp0s8
+
+================================================================================
+COLETA DE EVIDENCIAS VOLATEIS (ANTES DE ISOLAR)
+================================================================================
+
+# Windows - Criar diretorio
+mkdir C:\Evidencias
+
+# Windows - Conexoes de rede ativas
+netstat -ano > C:\Evidencias\netstat_antes.txt
+
+# Windows - Lista de processos
+tasklist /v > C:\Evidencias\tasklist_antes.txt
+
+# Windows - Sessoes de usuario
+query user > C:\Evidencias\sessoes_antes.txt
+
+# Windows - Cache DNS
+ipconfig /displaydns > C:\Evidencias\dns_cache.txt
+
+# Windows - Tabela ARP
+arp -a > C:\Evidencias\arp.txt
+
+# Windows - Conexoes SMB
+net session > C:\Evidencias\smb_sessions.txt
+net use > C:\Evidencias\smb_use.txt
+
+# Linux - Logando com usuário root
+sudo su
+
+# Linux - Conexoes de rede
+ss -tulpn > /evidencias/ss.txt
+
+# Linux - Processos
+ps auxf > /evidencias/ps.txt
+
+# Linux - Usuarios logados
+who > /tevidencias/who.txt
+
+# Linux - Tabela ARP
+arp -a > /evidencias/arp.txt
+
+================================================================================
+VERIFICACAO DO ISOLAMENTO
+================================================================================
+
+# Windows - Testar conectividade (deve FALHAR)
+ping 8.8.8.8 -n 2
+
+# Windows - Verificar conexoes remanescentes
+netstat -ano | findstr "ESTABLISHED"
+
+# Windows - Verificar status dos adaptadores
+netsh interface show interface
+
+# Linux - Testar conectividade (deve FALHAR)
+ping 8.8.8.8 -c 2
+
+# Linux - Verificar conexoes
+ss -tulpn
+
+# Linux - Verificar status das interfaces
+ip link show
+
+================================================================================
+COMANDOS UTEIS ADICIONAIS
+================================================================================
+
+# Windows - Identificar adaptador Host-Only (IP 192.168.56.x)
+ipconfig
+
+# Windows - Filtrar conexao especifica
+netstat -ano | findstr "192.168.56.20"
+
+# Windows - Identificar processo por PID
+tasklist | findstr "4521"
+
+# Windows - Matar processo
+taskkill /PID 4521 /F
+
+# Linux - Filtrar conexao especifica
+ss -tulpn | grep "4444"
+
+# Linux - Identificar processo por PID
+ps -p 4521
+
+# Linux - Matar processo
+sudo kill -9 4521
+
+================================================================================

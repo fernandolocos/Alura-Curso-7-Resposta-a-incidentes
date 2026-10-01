@@ -1,0 +1,164 @@
+================================================================================
+                    AULA 4.4 - COMANDOS DE REFERENCIA
+              Operacao BlackVault - Ransomware com persistencia via login
+================================================================================
+
+================================================================================
+SETUP DO LABORATORIO
+================================================================================
+
+# Windows (PowerShell Admin)
+cd C:\curso-soc-resposta-incidentes\scripts
+.\aula4_4_setup_final.ps1
+
+# Linux (PRIMEIRO vire root)
+sudo su -
+cd ~/curso-soc-resposta-incidentes/scripts
+chmod +x aula4_4_setup_final.sh
+./aula4_4_setup_final.sh
+exit
+
+================================================================================
+FASE 1 - IDENTIFICACAO WINDOWS
+================================================================================
+
+--- Tarefa agendada com trigger de evento ---
+
+Get-ScheduledTask | Where-Object { $_.Triggers.CimClass.CimClassName -contains "MSFT_TaskLogonTrigger" } | Select-Object TaskName, TaskPath
+
+Get-ScheduledTask -TaskName "MicrosoftEdgeUpdateTask" | Format-List *
+
+--- Conta backdoor ---
+
+net user
+net user svc_monitor
+net localgroup Administrators | findstr svc_monitor
+
+--- Nota de resgate ---
+
+type C:\DB_Data\README_BLACKVAULT.txt
+dir C:\DB_Data\
+
+================================================================================
+FASE 1 - IDENTIFICACAO LINUX
+================================================================================
+
+--- Script em /etc/profile.d/ ---
+
+ls -la /etc/profile.d/
+cat /etc/profile.d/01-lsb-check.sh
+
+--- Conta backdoor ---
+
+grep -E "/bin/bash|/bin/sh" /etc/passwd
+id monitor
+grep -E "^sudo|^wheel" /etc/group | grep monitor
+
+--- Nota de resgate ---
+
+cat /data/db/README_BLACKVAULT.txt
+ls -la /data/db/
+
+================================================================================
+FASE 2 - REMOCAO WINDOWS
+================================================================================
+
+--- 1. Remover conta backdoor primeiro ---
+
+net localgroup Administrators svc_monitor /delete
+net user svc_monitor /delete
+net user svc_monitor
+
+--- 2. Remover tarefa agendada ---
+
+Disable-ScheduledTask -TaskName "MicrosoftEdgeUpdateTask"
+Unregister-ScheduledTask -TaskName "MicrosoftEdgeUpdateTask" -Confirm:$false
+Get-ScheduledTask -TaskName "MicrosoftEdgeUpdateTask"
+
+--- 3. Mover binario para quarentena ---
+
+move "C:\ProgramData\Microsoft\monitor_agent.exe" C:\Quarentena\
+
+================================================================================
+FASE 2 - REMOCAO LINUX
+================================================================================
+
+--- 1. Remover conta backdoor primeiro ---
+
+gpasswd -d monitor sudo
+userdel -r monitor
+id monitor
+
+--- 2. Remover script de login ---
+
+cp /etc/profile.d/01-lsb-check.sh /quarentena/profile.d_01-lsb-check.sh.bak
+rm /etc/profile.d/01-lsb-check.sh
+ls -la /etc/profile.d/01-lsb-check.sh
+
+--- 3. Mover binario para quarentena ---
+
+pkill -f monitor-agent
+mv /tmp/.monitor-agent /quarentena/
+ls -la /tmp/.monitor-agent
+
+================================================================================
+FASE 3 - VALIDACAO
+================================================================================
+
+--- Windows ---
+
+net user svc_monitor
+Get-ScheduledTask -TaskName "MicrosoftEdgeUpdateTask"
+dir C:\ProgramData\Microsoft\monitor_agent.exe
+
+--- Linux ---
+
+id monitor
+ls -la /etc/profile.d/01-lsb-check.sh
+ls -la /tmp/.monitor-agent
+
+================================================================================
+FASE 4 - RECUPERACAO
+================================================================================
+
+--- Windows: restaurar do backup ---
+
+dir C:\Backup\
+copy "C:\Backup\clientes.mdf" "C:\DB_Data\clientes.mdf"
+copy "C:\Backup\vendas.ldf" "C:\DB_Data\vendas.ldf"
+copy "C:\Backup\produtos.mdf" "C:\DB_Data\produtos.mdf"
+copy "C:\Backup\financeiro.ldf" "C:\DB_Data\financeiro.ldf"
+copy "C:\Backup\rh_dados.mdf" "C:\DB_Data\rh_dados.mdf"
+del C:\DB_Data\*.blackvault
+dir C:\DB_Data\
+
+--- Linux: restaurar do backup ---
+
+ls -la /backup/
+cp /backup/clientes.mdf /data/db/clientes.mdf
+cp /backup/vendas.ldf /data/db/vendas.ldf
+cp /backup/produtos.mdf /data/db/produtos.mdf
+rm /data/db/*.blackvault
+rm /data/db/README_BLACKVAULT.txt
+ls -la /data/db/
+
+================================================================================
+FASE 4 - VALIDACAO DE INTEGRIDADE
+================================================================================
+
+--- Windows ---
+
+Get-ChildItem "C:\DB_Data\" -File | Where-Object { $_.Name -ne "manifesto_restaurado.sha256" } | ForEach-Object {
+    $hash = (Get-FileHash -Path $_.FullName -Algorithm SHA256).Hash
+    "$hash  $($_.Name)"
+} | Out-File "C:\DB_Data\manifesto_restaurado.sha256"
+
+Compare-Object (Get-Content "C:\Backup\manifesto_backup.sha256") (Get-Content "C:\DB_Data\manifesto_restaurado.sha256")
+
+--- Linux ---
+
+sha256sum /data/db/produtos.mdf /data/db/clientes.mdf /data/db/vendas.ldf  > /data/db/manifesto_restaurado.sha256
+
+diff /data/db/manifesto_restaurado.sha256 /backup/manifesto_backup.sha256
+
+================================================================================

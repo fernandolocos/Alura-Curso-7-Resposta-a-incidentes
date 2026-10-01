@@ -1,0 +1,82 @@
+================================================================================
+                    AULA 3.4 - COMANDOS DE REFERENCIA
+         Laboratorio de Contencao em Cenario Simulado
+================================================================================
+
+CENARIO:
+N1 recebe alerta de integridade em C:\DB_Data\
+N1 encontra nota de resgate, escala para N2
+N2 inicia investigacao
+
+================================================================================
+FASE 1 - INVESTIGACAO INICIAL
+================================================================================
+
+# Confirmar criptografia
+dir C:\DB_Data\
+type C:\DB_Data\README_DECRYPT.txt
+type C:\DB_Data\clientes.mdf
+type C:\Backup\clientes.mdf
+
+# Identificar conexao ativa
+netstat -ano | findstr "ESTABLISHED"
+netstat -ano | findstr ":22"
+Get-WinEvent -LogName "OpenSSH/Operational" -MaxEvents 20
+
+================================================================================
+FASE 2 - IDENTIFICACAO DO ATACANTE (SYSMON)
+================================================================================
+
+Get-WinEvent -LogName "Microsoft-Windows-Sysmon/Operational" -MaxEvents 100 | 
+    Where-Object { $_.Id -eq 1 -and $_.Message -match "svc_backup" } |
+    Select-Object TimeCreated, 
+        @{Name="User"; Expression={$_.Properties[9].Value}}, 
+        @{Name="Command"; Expression={$_.Properties[10].Value}} |
+    Format-Table -AutoSize -Wrap
+
+================================================================================
+FASE 3 - COLETA DE EVIDENCIAS
+================================================================================
+
+mkdir C:\Evidencias
+netstat -ano > C:\Evidencias\netstat_antes.txt
+tasklist /v > C:\Evidencias\tasklist_antes.txt
+ipconfig /displaydns > C:\Evidencias\dns_cache.txt
+arp -a > C:\Evidencias\arp.txt
+Get-WinEvent -LogName "Microsoft-Windows-Sysmon/Operational" -MaxEvents 100 | 
+    Where-Object { $_.Id -eq 1 -and $_.Message -match "svc_backup" } |
+    Select-Object TimeCreated, 
+        @{Name="User"; Expression={$_.Properties[9].Value}}, 
+        @{Name="Command"; Expression={$_.Properties[10].Value}} |
+    Format-Table -AutoSize -Wrap > C:\Evidencias\sysmon_logs.txt
+Get-WinEvent -LogName "OpenSSH/Operational" -MaxEvents 100 > C:\Evidencias\openssh_logs.txt
+
+================================================================================
+FASE 4 - CONTENCAO DO ENDPOINT
+================================================================================
+
+Get-NetAdapter | Disable-NetAdapter -Confirm:$false
+
+================================================================================
+FASE 5 - BLOQUEIO DE CREDENCIAIS
+================================================================================
+
+net user svc_backup /active:no
+net user svc_backup
+
+================================================================================
+FASE 6 - CONTENCAO DE MOVIMENTO LATERAL
+================================================================================
+
+netsh advfirewall firewall add rule name="Contencao_SSH" dir=in localport=22 protocol=tcp action=block
+netsh advfirewall firewall show rule name="Contencao_SSH"
+
+================================================================================
+REVERTER O AMBIENTE
+================================================================================
+
+Get-NetAdapter | Enable-NetAdapter -Confirm:$false
+net user svc_backup /active:yes
+netsh advfirewall firewall delete rule name="Contencao_SSH"
+
+================================================================================

@@ -1,0 +1,168 @@
+================================================================================
+                    AULA 4.2 - COMANDOS DE REFERENCIA
+         Remocao de Artefatos e Validacao da Erradicacao
+================================================================================
+
+================================================================================
+ORDEM CORRETA DE REMOCAO
+================================================================================
+
+1. Processos ativos (matar primeiro)
+2. Persistencias (remover mecanismos de reinicio)
+3. Arquivos (mover para quarentena)
+4. Configuracoes de rede (remover regras)
+
+================================================================================
+REMOCAO - WINDOWS
+================================================================================
+
+--- Processos ---
+
+# Identificar PID pela porta
+$pid = (Get-NetTCPConnection -LocalPort 2222).OwningProcess
+Get-Process -Id $pid
+
+# Matar processo
+Stop-Process -Id $pid -Force
+
+# Verificar
+netstat -ano | findstr "2222"
+
+--- Tarefas Agendadas ---
+
+# Ver antes de remover
+schtasks /query /tn "WindowsUpdate" /fo LIST /v
+
+# Remover
+schtasks /delete /tn "WindowsUpdate" /f
+
+# Verificar
+schtasks /query /tn "WindowsUpdate"
+
+--- Registro ---
+
+# Ver antes de remover
+reg query "HKLM\Software\Microsoft\Windows\CurrentVersion\Run" /v "Windows Service"
+
+# Remover
+reg delete "HKLM\Software\Microsoft\Windows\CurrentVersion\Run" /v "Windows Service" /f
+
+# Verificar
+reg query "HKLM\Software\Microsoft\Windows\CurrentVersion\Run"
+
+--- Arquivos ---
+
+# Criar quarentena
+mkdir C:\Quarentena
+
+# Mover para quarentena
+move "C:\ProgramData\Microsoft\winupdate.bat" C:\Quarentena\
+
+# Verificar
+dir C:\ProgramData\Microsoft\winupdate.bat
+
+# Depois de validar, deletar permanentemente
+del C:\Quarentena\winupdate.bat
+
+--- Firewall ---
+
+# Ver antes de remover
+Get-NetFirewallRule -DisplayName "Allow_SSH_Backdoor"
+
+# Remover
+Remove-NetFirewallRule -DisplayName "Allow_SSH_Backdoor"
+
+# Verificar
+Get-NetFirewallRule -DisplayName "Allow_SSH_Backdoor"
+
+================================================================================
+REMOCAO - LINUX (como root: sudo su -)
+================================================================================
+
+--- Processos ---
+
+# Matar processo backdoor
+pkill -f "nginx-backdoor"
+
+# Matar netcat
+pkill -f "nc -l -p 4444"
+
+# Verificar
+ps aux | grep -E "nginx-backdoor|nc -l" | grep -v grep
+
+--- Cron Jobs ---
+
+# Remover do crontab do root
+crontab -l | grep -v "nginx-backdoor" | crontab -
+
+# Verificar
+crontab -l
+
+# Remover arquivo do cron.d
+rm /etc/cron.d/nginx-backdoor
+
+# Verificar
+ls -la /etc/cron.d/nginx-backdoor
+
+--- Servico systemd ---
+
+# Parar servico
+systemctl stop nginx-backup
+
+# Desabilitar
+systemctl disable nginx-backup
+
+# Remover arquivo
+rm /etc/systemd/system/nginx-backup.service
+
+# Recarregar systemd
+systemctl daemon-reload
+
+# Verificar
+systemctl status nginx-backup
+
+--- Arquivos ---
+
+# Criar quarentena
+mkdir -p /quarentena
+
+# Mover para quarentena
+mv /tmp/.nginx-backdoor /quarentena/
+mv /tmp/.backdoor.log /quarentena/
+
+# Verificar
+ls -la /tmp/.nginx-backdoor
+ls -la /tmp/.backdoor.log
+
+# Depois de validar, deletar permanentemente
+rm /quarentena/.nginx-backdoor
+rm /quarentena/.backdoor.log
+
+--- Porta ---
+
+# Verificar se porta foi liberada
+ss -tlnp | grep 4444
+
+================================================================================
+VALIDACAO - WINDOWS
+================================================================================
+
+netstat -ano | findstr "2222"
+schtasks /query /tn "WindowsUpdate"
+reg query "HKLM\Software\Microsoft\Windows\CurrentVersion\Run" /v "Windows Service"
+Get-NetFirewallRule -DisplayName "Allow_SSH_Backdoor"
+dir C:\ProgramData\Microsoft\winupdate.bat
+
+================================================================================
+VALIDACAO - LINUX
+================================================================================
+
+ps aux | grep -E "nginx-backdoor|nc -l" | grep -v grep
+ss -tlnp | grep 4444
+crontab -l | grep nginx-backdoor
+ls -la /etc/cron.d/nginx-backdoor
+systemctl status nginx-backup
+ls -la /tmp/.nginx-backdoor
+ls -la /tmp/.backdoor.log
+
+================================================================================

@@ -1,0 +1,45 @@
+timestamp,user,ip,country,status,mfa,details
+2026-06-19 08:00:01,carlos.oliveira,203.0.113.45,Nigéria,failure,disabled,Senha incorreta
+2026-06-19 08:00:05,carlos.oliveira,203.0.113.45,Nigéria,failure,disabled,Senha incorreta
+2026-06-19 08:00:09,carlos.oliveira,203.0.113.45,Nigéria,failure,disabled,Senha incorreta
+2026-06-19 08:00:12,carlos.oliveira,203.0.113.45,Nigéria,failure,disabled,Senha incorreta
+2026-06-19 08:00:16,carlos.oliveira,203.0.113.45,Nigéria,failure,disabled,Senha incorreta
+2026-06-19 08:00:20,carlos.oliveira,203.0.113.45,Nigéria,failure,disabled,Senha incorreta
+2026-06-19 08:00:23,carlos.oliveira,203.0.113.45,Nigéria,failure,disabled,Senha incorreta
+2026-06-19 08:00:27,carlos.oliveira,203.0.113.45,Nigéria,failure,disabled,Senha incorreta
+2026-06-19 08:00:31,carlos.oliveira,203.0.113.45,Nigéria,failure,disabled,Senha incorreta
+2026-06-19 08:00:35,carlos.oliveira,203.0.113.45,Nigéria,failure,disabled,Senha incorreta
+2026-06-19 08:00:38,carlos.oliveira,203.0.113.45,Nigéria,failure,disabled,Senha incorreta
+2026-06-19 08:00:42,carlos.oliveira,203.0.113.45,Nigéria,failure,disabled,Senha incorreta
+2026-06-19 08:00:46,carlos.oliveira,203.0.113.45,Nigéria,failure,disabled,Senha incorreta
+2026-06-19 08:00:50,carlos.oliveira,203.0.113.45,Nigéria,failure,disabled,Senha incorreta
+2026-06-19 08:00:54,carlos.oliveira,203.0.113.45,Nigéria,failure,disabled,Senha incorreta
+2026-06-19 08:00:57,carlos.oliveira,203.0.113.45,Nigéria,failure,disabled,Senha incorreta
+2026-06-19 08:01:01,carlos.oliveira,203.0.113.45,Nigéria,failure,disabled,Senha incorreta
+2026-06-19 08:01:05,carlos.oliveira,203.0.113.45,Nigéria,failure,disabled,Senha incorreta
+2026-06-19 08:01:09,carlos.oliveira,203.0.113.45,Nigéria,failure,disabled,Senha incorreta
+2026-06-19 08:01:13,carlos.oliveira,203.0.113.45,Nigéria,failure,disabled,Senha incorreta
+2026-06-19 08:01:16,carlos.oliveira,203.0.113.45,Nigéria,failure,disabled,Senha incorreta
+2026-06-19 08:01:20,carlos.oliveira,203.0.113.45,Nigéria,failure,disabled,Senha incorreta
+2026-06-19 08:01:24,carlos.oliveira,203.0.113.45,Nigéria,failure,disabled,Senha incorreta
+2026-06-19 08:01:28,carlos.oliveira,203.0.113.45,Nigéria,failure,disabled,Senha incorreta
+2026-06-19 08:01:32,carlos.oliveira,203.0.113.45,Nigéria,failure,disabled,Senha incorreta
+2026-06-19 08:01:35,carlos.oliveira,203.0.113.45,Nigéria,failure,disabled,Senha incorreta
+2026-06-19 08:01:39,carlos.oliveira,203.0.113.45,Nigéria,failure,disabled,Senha incorreta
+2026-06-19 08:01:43,carlos.oliveira,203.0.113.45,Nigéria,failure,disabled,Senha incorreta
+2026-06-19 08:01:47,carlos.oliveira,203.0.113.45,Nigéria,failure,disabled,Senha incorreta
+2026-06-19 08:01:51,carlos.oliveira,203.0.113.45,Nigéria,failure,disabled,Senha incorreta
+2026-06-19 08:01:54,carlos.oliveira,203.0.113.45,Nigéria,failure,disabled,Senha incorreta
+2026-06-19 08:01:58,carlos.oliveira,203.0.113.45,Nigéria,failure,disabled,Senha incorreta
+2026-06-19 08:02:02,carlos.oliveira,203.0.113.45,Nigéria,failure,disabled,Senha incorreta
+2026-06-19 08:02:06,carlos.oliveira,203.0.113.45,Nigéria,failure,disabled,Senha incorreta
+2026-06-19 08:02:10,carlos.oliveira,203.0.113.45,Nigéria,failure,disabled,Senha incorreta
+2026-06-19 08:02:13,carlos.oliveira,203.0.113.45,Nigéria,failure,disabled,Senha incorreta
+2026-06-19 08:02:17,carlos.oliveira,203.0.113.45,Nigéria,failure,disabled,Senha incorreta
+2026-06-19 08:02:21,carlos.oliveira,203.0.113.45,Nigéria,failure,disabled,Senha incorreta
+2026-06-19 08:02:25,carlos.oliveira,203.0.113.45,Nigéria,failure,disabled,Senha incorreta
+2026-06-19 08:02:28,carlos.oliveira,203.0.113.45,Nigéria,failure,disabled,Senha incorreta
+2026-06-19 08:02:30,carlos.oliveira,203.0.113.45,Nigéria,success,disabled,Login bem-sucedido - Senha correta
+2026-06-19 08:03:15,carlos.oliveira,203.0.113.45,Nigéria,success,disabled,Criação de regra de inbox: Forward para suspeito@protonmail.com
+2026-06-19 08:05:00,carlos.oliveira,203.0.113.45,Nigéria,success,disabled,Registro de aplicação OAuth 'MailSync' com permissões mail.read mail.send
+2026-06-19 08:10:00,carlos.oliveira,203.0.113.45,Nigéria,success,disabled,Download de anexos de e-mails dos últimos 30 dias

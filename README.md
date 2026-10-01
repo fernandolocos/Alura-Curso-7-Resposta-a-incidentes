@@ -64,7 +64,7 @@ Ao final do curso, você será capaz de:
     
 - **Linguagens:** PowerShell, Bash, Python 3
     
-- **Ferramentas:** Sysinternals Suite, Wireshark, Sysmon, netcat, tcpdump
+- **Ferramentas:** Sysinternals Suite, Sysmon, netcat, tcpdump
     
 - **Frameworks:** NIST SP 800-61, PICERL
     

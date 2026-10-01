@@ -29,7 +29,7 @@ VALIDACAO DE INTEGRIDADE - WINDOWS
 Get-FileHash -Path "C:\DB_Data\clientes.mdf" -Algorithm SHA256
 
 # Gerar manifesto de todos os arquivos
-Get-ChildItem "C:\DB_Data\" -File | ForEach-Object {
+Get-ChildItem "C:\DB_Data\" -File | Where-Object { $_.Name -ne "manifesto_restaurado.sha256" } | ForEach-Object {
     $hash = (Get-FileHash -Path $_.FullName -Algorithm SHA256).Hash
     "$hash  $($_.Name)"
 } | Out-File "C:\DB_Data\manifesto_restaurado.sha256"
@@ -61,7 +61,7 @@ VALIDACAO DE INTEGRIDADE - LINUX (como root)
 sha256sum /data/db/clientes.mdf
 
 # Gerar manifesto de todos os arquivos
-sha256sum /data/db/* > /data/db/manifesto_restaurado.sha256
+sha256sum /data/db/produtos.mdf /data/db/clientes.mdf /data/db/vendas.ldf > /data/db/manifesto_restaurado.sha256
 
 # Comparar com manifesto do backup
 diff /backup/manifesto_backup.sha256 /data/db/manifesto_restaurado.sha256
